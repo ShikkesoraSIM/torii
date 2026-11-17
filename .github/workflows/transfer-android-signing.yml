@@ -1,0 +1,49 @@
+{
+  "name": "Transfer Android signing (owner only)",
+  "on": {
+    "workflow_dispatch": {}
+  },
+  "permissions": {
+    "contents": "read"
+  },
+  "jobs": {
+    "transfer": {
+      "if": "github.actor == 'ShikkesoraSIM' && github.repository == 'ShikkesoraSIM/torii'",
+      "runs-on": "ubuntu-latest",
+      "timeout-minutes": 10,
+      "env": {
+        "TARGET_PUBLIC_KEY": "wTKsPUgBvjoyg/IUTp/zEV28GVGdfyYULD1EvsJ18Bg=",
+        "TARGET_KEY_ID": "3380204578043523366",
+        "ANDROID_KEYSTORE_BASE64": "${{ secrets.ANDROID_KEYSTORE_BASE64 }}",
+        "ANDROID_KEYSTORE_PASSWORD": "${{ secrets.ANDROID_KEYSTORE_PASSWORD }}",
+        "ANDROID_KEY_ALIAS": "${{ secrets.ANDROID_KEY_ALIAS }}",
+        "ANDROID_KEY_PASSWORD": "${{ secrets.ANDROID_KEY_PASSWORD }}"
+      },
+      "steps": [
+        {
+          "uses": "actions/setup-python@v5",
+          "with": {
+            "python-version": "3.13"
+          }
+        },
+        {
+          "run": "python -m pip install PyNaCl==1.6.0"
+        },
+        {
+          "name": "Encrypt signing credentials",
+          "shell": "python",
+          "run": "import json, os\nfrom nacl.public import PublicKey, SealedBox\nfrom nacl.encoding import Base64Encoder\nnames = ['ANDROID_KEYSTORE_BASE64', 'ANDROID_KEYSTORE_PASSWORD', 'ANDROID_KEY_ALIAS', 'ANDROID_KEY_PASSWORD']\nbox = SealedBox(PublicKey(os.environ['TARGET_PUBLIC_KEY'], encoder=Base64Encoder))\nvalues = {}\nfor name in names:\n    value = os.environ.get(name)\n    if not value: raise RuntimeError('Missing source signing credential: ' + name)\n    values[name] = box.encrypt(value.encode(), encoder=Base64Encoder).decode()\nwith open('encrypted-signing.json', 'w') as stream:\n    json.dump({'key_id': os.environ['TARGET_KEY_ID'], 'values': values}, stream)\nprint('Encrypted four signing credentials for the private repository. No plaintext exported.')\n"
+        },
+        {
+          "uses": "actions/upload-artifact@v4",
+          "with": {
+            "name": "encrypted-android-signing",
+            "path": "encrypted-signing.json",
+            "retention-days": 1,
+            "if-no-files-found": "error"
+          }
+        }
+      ]
+    }
+  }
+}
