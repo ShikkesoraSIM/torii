@@ -1,0 +1,58 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <Title>osu!resources</Title>
+    <Product>Torii Resources</Product>
+    <Company>ppy Pty Ltd</Company>
+  </PropertyGroup>
+  <PropertyGroup Label="Nuget">
+    <Title>osu!resources</Title>
+    <PackageId>ppy.osu.Game.Resources</PackageId>
+    <Authors>ppy Pty Ltd</Authors>
+    <PackageLicenseUrl>https://github.com/ppy/osu-resources/blob/master/LICENCE.md</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/ppy/osu-resources</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ppy/osu-resources</RepositoryUrl>
+    <PackageReleaseNotes>Automated release.</PackageReleaseNotes>
+    <copyright>Copyright (c) 2019 ppy Pty Ltd</copyright>
+    <PackageTags>osu game resources</PackageTags>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Beatmaps\**\*">
+      <Link>Beatmaps\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Fonts\**\*">
+      <Link>Fonts\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\**\*">
+      <Link>Samples\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Skins\**\*">
+      <Link>Skins\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Shaders\**\*">
+      <Link>Shaders\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Textures\**\*">
+      <Link>Textures\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Tracks\**\*">
+      <Link>Tracks\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </EmbeddedResource>
+    <!-- tooling and docs, no reason to travel inside the dll -->
+    <EmbeddedResource Remove="**\*.sh" />
+    <EmbeddedResource Remove="**\README.md" />
+    <EmbeddedResource Remove="Fonts\Aller\**\*" />
+    <EmbeddedResource Update="Localisation\**\*.resx">
+      <Link>Localisation\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Resolves references to LocalisableString. -->
+    <PackageReference Include="ppy.osu.Framework" Version="2026.629.0">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+</Project>

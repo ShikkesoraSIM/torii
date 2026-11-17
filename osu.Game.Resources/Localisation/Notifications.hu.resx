@@ -1,0 +1,216 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="header_title" xml:space="preserve">
+    <value>értesítések</value>
+  </data>
+  <data name="header_description" xml:space="preserve">
+    <value>csak rád vár</value>
+  </data>
+  <data name="running_tasks" xml:space="preserve">
+    <value>Futó Feladatok</value>
+  </data>
+  <data name="clear_all" xml:space="preserve">
+    <value>Összes Törlése</value>
+  </data>
+  <data name="battery_low" xml:space="preserve">
+    <value>Az akkumulátor töltöttségi szintje alacsony! Töltsd fel eszközöd, hogy elkerüld a játék közbeni megszakításokat.</value>
+  </data>
+  <data name="game_volume_too_low" xml:space="preserve">
+    <value>A játék hangereje túl halk ahhoz, hogy bármit is hallj! Kattints ide a visszaállításhoz.</value>
+  </data>
+  <data name="no_autoplay_mod" xml:space="preserve">
+    <value>A jelenlegi ruleszet nem rendelkezik automatikus lejátszási móddal!</value>
+  </data>
+  <data name="audio_playback_issue" xml:space="preserve">
+    <value>osu! úgy tűnik, hogy nem tudja megfelelően lejátszani a hangot.\n\nKérjük, módosítsa az audioeszközt működő beállításra.</value>
+  </data>
+  <data name="score_overlay_disabled" xml:space="preserve">
+    <value>A pontszámfedvény jelenleg le van tiltva. Ezt a {0} gomb megnyomásával válthatod.</value>
+  </data>
+  <data name="unsupported_or_dangerous_url_protocol" xml:space="preserve">
+    <value>A(z) {0} URL nem támogatott vagy veszélyes protokollt használ, így nem lett megnyitva.</value>
+  </data>
+  <data name="subsequent_messages_logged" xml:space="preserve">
+    <value>Egymást követő üzenetek naplózva lettek. Kattints, hogy megtekintsd a naplófájlokat.</value>
+  </data>
+  <data name="tablet_support_disabled_due_to_error" xml:space="preserve">
+    <value>Digitális rajztábla támogatás kikapcsolása e hiba miatt: "{0}"</value>
+  </data>
+  <data name="encountered_tablet_warning" xml:space="preserve">
+    <value>Digitális rajztábla figyelmezetetésbe ütközött, a rajztáblád lehet nem megfelelően fog működni. Kattints ide a támogatott rajztáblák teljes listájának megtekintéséhez.</value>
+  </data>
+  <data name="unsupported_link_type" xml:space="preserve">
+    <value>Ez a link típus még nem támogatott!</value>
+  </data>
+  <data name="invited_you_to_the_multiplayer" xml:space="preserve">
+    <value>{0} meghívott téged a "{1}" többjátékos meccsre! Kattints a csatlakozáshoz.</value>
+  </data>
+  <data name="missing_beatmap_for_replay" xml:space="preserve">
+    <value>Nincs meg a beatmapod ehhez a visszajátszáshoz.</value>
+  </data>
+  <data name="downloading_beatmap_for_replay" xml:space="preserve">
+    <value>Hiányzó beatmap letöltése ehhez a visszajátszáshoz...</value>
+  </data>
+  <data name="mismatching_beatmap_for_replay" xml:space="preserve">
+    <value>A beatmap helyi változata ehhez a visszajátszáshoz más, mint elvárt. Lehet, hogy frissítened vagy újra le kell töltened.</value>
+  </data>
+  <data name="game_version_after_update" xml:space="preserve">
+    <value>Mostantól osu! {0} futtatod.
+Kattints, hogy lásd az újdonságokat!</value>
+  </data>
+  <data name="update_ready_to_install" xml:space="preserve">
+    <value>Frissítés készen áll a telepítésre. Kattints az újraindításhoz!</value>
+  </data>
+  <data name="not_official_build" xml:space="preserve">
+    <value>Ez nem egy hivatalos kiadványa a játéknak. Pontszámok nem lesznek elküldve és egyéb online rendszerek nem biztos, hogy megfelelően működnek.</value>
+  </data>
+  <data name="downloading_update" xml:space="preserve">
+    <value>Frissítés letöltése...</value>
+  </data>
+  <data name="multiplayer_room_ended" xml:space="preserve">
+    <value>Ez a többjátékos szoba lezárult. Kattintson a szoba eredményeinek megtekintéséhez.</value>
+  </data>
+  <data name="mention" xml:space="preserve">
+    <value>Említés</value>
+  </data>
+  <data name="mention_details" xml:space="preserve">
+    <value>{0} ebben: {1}</value>
+  </data>
+  <data name="friend_online" xml:space="preserve">
+    <value>Online: {0}</value>
+  </data>
+  <data name="friend_offline" xml:space="preserve">
+    <value>Offline: {0}</value>
+  </data>
+  <data name="api_connection_interrupted" xml:space="preserve">
+    <value>Megszakadt a kapcsolat az online szolgáltatásokkal. Az osu! korlátozott funkcionalitással fog működni.</value>
+  </data>
+  <data name="another_device_disconnect" xml:space="preserve">
+    <value>Ezen az eszközön kijelentkeztél, mivel egy másik eszközön bejelentkeztél a fiókodba.</value>
+  </data>
+  <data name="account_change_disconnect" xml:space="preserve">
+    <value>A fiókjában történt változás miatt kijelentkezett. Kérjük, jelentkezzen be újra.</value>
+  </data>
+  <data name="downloading" xml:space="preserve">
+    <value>{0} Letöltése</value>
+  </data>
+  <data name="collections_import_initialising" xml:space="preserve">
+    <value>A gyűjtemények importálása előkészítés alatt áll...</value>
+  </data>
+  <data name="reading_collections" xml:space="preserve">
+    <value>Gyűjtemények olvasása...</value>
+  </data>
+  <data name="collections_import_progress" xml:space="preserve">
+    <value>{0} gyűjtemény importálva</value>
+  </data>
+  <data name="collections_import_progress_total" xml:space="preserve">
+    <value>{1} gyűjteményből {0} darabot importáltak</value>
+  </data>
+  <data name="error_automatically_reported" xml:space="preserve">
+    <value>Ezt a hibát automatikusan jelentették a fejlesztőcsapatnak.</value>
+  </data>
+  <data name="update_available" xml:space="preserve">
+    <value>Az osu! újabb verziója került elő ({0} → {1}).</value>
+  </data>
+  <data name="update_available_manual_install" xml:space="preserve">
+    <value>Kattintson ide az új verzió letöltéséhez, amelyet a meglévő telepítés felett is telepíthet.</value>
+  </data>
+  <data name="update_available_package_managed" xml:space="preserve">
+    <value>Kérdezze meg a csomagkezelőjét vagy szolgáltatóját, hogyan frissítheti az osu!-t!</value>
+  </data>
+  <data name="action_interrupted_by_dialog" xml:space="preserve">
+    <value>Egy művelet megszakadt, mert megjelent egy párbeszédablak.</value>
+  </data>
+  <data name="file_export_ongoing" xml:space="preserve">
+    <value>{0} exportálása...</value>
+  </data>
+  <data name="file_export_finished" xml:space="preserve">
+    <value>{0} exportálva! Kattintson a megtekintéshez.</value>
+  </data>
+  <data name="logs_export_ongoing" xml:space="preserve">
+    <value>Naplófájlok exportálása...</value>
+  </data>
+  <data name="logs_export_finished" xml:space="preserve">
+    <value>Exportált naplófájlok! Kattintson a megtekintéshez.</value>
+  </data>
+  <data name="elevated_privileges" xml:space="preserve">
+    <value>Az osu! {0} felhasználóként való futtatása nem javítja a teljesítményt, megzavarhatja az integrációkat, és biztonsági kockázatot jelent. Kérjük, futtassa a játékot normál felhasználóként.</value>
+  </data>
+  <data name="macos_app_location" xml:space="preserve">
+    <value>MacOS rendszeren az osu! játéknak a /Applications vagy a {0}/Applications könyvtáron kívüli helyre történő telepítése problémákat okozhat a játék frissítésekor. Kérjük, helyezd át a játék telepítési könyvtárát az egyik fenti helyre.</value>
+  </data>
+  <data name="screenshot_saved" xml:space="preserve">
+    <value>A képernyőkép elmentve! Kattintson a megtekintéshez.
+{0}</value>
+  </data>
+  <data name="multiplayer_server_shutting_down_immediately" xml:space="preserve">
+    <value>A többjátékos szerver hamarosan újra elérhető lesz...</value>
+  </data>
+  <data name="multiplayer_server_shutting_down_remaining" xml:space="preserve">
+    <value>A többjátékos szerver {0} után újraindul.</value>
+  </data>
+  <data name="collection_created" xml:space="preserve">
+    <value>Létrehoztam egy új gyűjteményt „{0}” néven, amely {1} beatmapet tartalmaz.</value>
+  </data>
+  <data name="collection_beatmaps_added" xml:space="preserve">
+    <value>{0} beatmap-et hozzáadtam a „{1}” gyűjteményhez.</value>
+  </data>
+</root>

@@ -1,0 +1,247 @@
+[
+  {
+    "filename": "ranking-panel@2x.png",
+    "source": "Ranking Panel.psd",
+    "layer": "Top",
+    "width": 2670,
+    "height": 902
+  },
+  {
+    "filename": "ranking-maxcombo@2x.png",
+    "source": "Ranking Panel.psd",
+    "layer": "ranking-maxCombo.png",
+    "width": 201,
+    "height": 28
+  },
+  {
+    "filename": "ranking-accuracy@2x.png",
+    "source": "Ranking Panel.psd",
+    "layer": "ranking-accuracy.png",
+    "width": 157,
+    "height": 36
+  },
+  {
+    "filename": "ranking-title@2x.png",
+    "source": "Ranking Panel.psd",
+    "layer": "ranking-title.png",
+    "width": 215,
+    "height": 37
+  },
+  {
+    "filename": "ranking-graph@2x.png",
+    "source": "Ranking Panel.psd",
+    "layer": "ranking-graph.png",
+    "width": 605,
+    "height": 285
+  },
+  {
+    "filename": "ranking-perfect@2x.png",
+    "source": "Ranking Panel.psd",
+    "layer": "ranking-perfect.png",
+    "width": 605,
+    "height": 285
+  },
+  {
+    "filename": "pause-replay@2x.png",
+    "source": "Ranking Panel.psd",
+    "layer": "pause-replay.png",
+    "width": 387,
+    "height": 131
+  },
+  {
+    "filename": "ranking-retry@2x.png",
+    "source": "Ranking Panel.psd",
+    "layer": "ranking-retry.png",
+    "width": 387,
+    "height": 131
+  },
+  {
+    "filename": "ranking-D@2x.png",
+    "source": "Ranking Panel.psd",
+    "layer": "ranking-D.png",
+    "width": 324,
+    "height": 352
+  },
+  {
+    "filename": "ranking-C@2x.png",
+    "source": "Ranking Panel.psd",
+    "layer": "ranking-C.png",
+    "width": 318,
+    "height": 366
+  },
+  {
+    "filename": "ranking-B@2x.png",
+    "source": "Ranking Panel.psd",
+    "layer": "ranking-B.png",
+    "width": 268,
+    "height": 352
+  },
+  {
+    "filename": "ranking-A@2x.png",
+    "source": "Ranking Panel.psd",
+    "layer": "ranking-A.png",
+    "width": 357,
+    "height": 352
+  },
+  {
+    "filename": "ranking-S@2x.png",
+    "source": "Ranking Panel.psd",
+    "layer": "ranking-S.png",
+    "width": 261,
+    "height": 366
+  },
+  {
+    "filename": "ranking-X@2x.png",
+    "source": "Ranking Panel.psd",
+    "layer": "ranking-X.png",
+    "width": 358,
+    "height": 352
+  },
+  {
+    "filename": "ranking-SH@2x.png",
+    "source": "Ranking Panel.psd",
+    "layer": "ranking-SH.png",
+    "width": 261,
+    "height": 366
+  },
+  {
+    "filename": "ranking-XH@2x.png",
+    "source": "Ranking Panel.psd",
+    "layer": "ranking-XH.png",
+    "width": 358,
+    "height": 352
+  },
+  {
+    "filename": "selection-options-over@2x.png",
+    "source": "Song Select.psd",
+    "layer": "selection-options-over.png",
+    "width": 137,
+    "height": 123
+  },
+  {
+    "filename": "selection-random-over@2x.png",
+    "source": "Song Select.psd",
+    "layer": "selection-random-over.png",
+    "width": 137,
+    "height": 123
+  },
+  {
+    "filename": "selection-mods-over@2x.png",
+    "source": "Song Select.psd",
+    "layer": "selection-mods-over.png",
+    "width": 137,
+    "height": 123
+  },
+  {
+    "filename": "selection-mode-over@2x.png",
+    "source": "Song Select.psd",
+    "layer": "selection-mode-over.png",
+    "width": 167,
+    "height": 123
+  },
+  {
+    "filename": "menu-button-background@2x.png",
+    "source": "Song Select.psd",
+    "layer": "menu-button-background.png",
+    "width": 1383,
+    "height": 203
+  },
+  {
+    "filename": "score-x@2x.png",
+    "source": "Global Gameplay.psd",
+    "layer": "main-x.png",
+    "width": 22,
+    "height": 27
+  },
+  {
+    "filename": "score-percent@2x.png",
+    "source": "Global Gameplay.psd",
+    "layer": "main-percent.png",
+    "width": 32,
+    "height": 36
+  },
+  {
+    "filename": "score-dot@2x.png",
+    "source": "Global Gameplay.psd",
+    "layer": "main-dot.png",
+    "width": 5,
+    "height": 5
+  },
+  {
+    "filename": "score-comma@2x.png",
+    "source": "Global Gameplay.psd",
+    "layer": "main-comma.png",
+    "width": 5,
+    "height": 5
+  },
+  {
+    "filename": "score-9@2x.png",
+    "source": "Global Gameplay.psd",
+    "layer": "main-9.png",
+    "width": 22,
+    "height": 36
+  },
+  {
+    "filename": "score-8@2x.png",
+    "source": "Global Gameplay.psd",
+    "layer": "main-8.png",
+    "width": 23,
+    "height": 36
+  },
+  {
+    "filename": "score-7@2x.png",
+    "source": "Global Gameplay.psd",
+    "layer": "main-7.png",
+    "width": 23,
+    "height": 36
+  },
+  {
+    "filename": "score-6@2x.png",
+    "source": "Global Gameplay.psd",
+    "layer": "main-6.png",
+    "width": 22,
+    "height": 36
+  },
+  {
+    "filename": "score-5@2x.png",
+    "source": "Global Gameplay.psd",
+    "layer": "main-5.png",
+    "width": 21,
+    "height": 36
+  },
+  {
+    "filename": "score-4@2x.png",
+    "source": "Global Gameplay.psd",
+    "layer": "main-4.png",
+    "width": 25,
+    "height": 36
+  },
+  {
+    "filename": "score-3@2x.png",
+    "source": "Global Gameplay.psd",
+    "layer": "main-3.png",
+    "width": 22,
+    "height": 36
+  },
+  {
+    "filename": "score-2@2x.png",
+    "source": "Global Gameplay.psd",
+    "layer": "main-2.png",
+    "width": 23,
+    "height": 36
+  },
+  {
+    "filename": "score-1@2x.png",
+    "source": "Global Gameplay.psd",
+    "layer": "main-1.png",
+    "width": 13,
+    "height": 36
+  },
+  {
+    "filename": "score-0@2x.png",
+    "source": "Global Gameplay.psd",
+    "layer": "main-0.png",
+    "width": 21,
+    "height": 36
+  }
+]

@@ -1,0 +1,311 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="beatmap_editor" xml:space="preserve">
+    <value>Rytmikartan muokkain</value>
+  </data>
+  <data name="waveform_opacity" xml:space="preserve">
+    <value>Aaltomuodon läpinäkyvyys</value>
+  </data>
+  <data name="show_storyboard" xml:space="preserve">
+    <value>Näytä storyboard</value>
+  </data>
+  <data name="show_hit_markers" xml:space="preserve">
+    <value>Näytä osumamerkit</value>
+  </data>
+  <data name="auto_seek_on_placement" xml:space="preserve">
+    <value>Siirrä näkymää automaattisesti kohteiden asettamisen jälkeen</value>
+  </data>
+  <data name="timing" xml:space="preserve">
+    <value>Ajoitus</value>
+  </data>
+  <data name="set_preview_point_to_current" xml:space="preserve">
+    <value>Aseta esikatselupiste nykyiseen aikaan</value>
+  </data>
+  <data name="snap_all_notes_to_current_snap_divisor" xml:space="preserve">
+    <value>Napsauta kaikki nuotit tämänhetkiseen snap divisoriin</value>
+  </data>
+  <data name="adjust_existing_objects_on_timing_changes" xml:space="preserve">
+    <value>Siirrä jo asetetut objektit ajastusta muuttaessasi</value>
+  </data>
+  <data name="export_for_editing" xml:space="preserve">
+    <value>Muokkausta varten (.olz)</value>
+  </data>
+  <data name="export_for_compatibility" xml:space="preserve">
+    <value>Yhteensopivuutta varten (.osz)</value>
+  </data>
+  <data name="export_guest_difficulty" xml:space="preserve">
+    <value>Vieraileva vaikeustaso (.osu)</value>
+  </data>
+  <data name="create_new_difficulty" xml:space="preserve">
+    <value>Luo uusi vaikeustaso</value>
+  </data>
+  <data name="change_difficulty" xml:space="preserve">
+    <value>Vaihda vaikeustasoa</value>
+  </data>
+  <data name="delete_difficulty" xml:space="preserve">
+    <value>Poista vaikeustaso</value>
+  </data>
+  <data name="edit_externally" xml:space="preserve">
+    <value>Muokkaa ulkoisesti</value>
+  </data>
+  <data name="submit_beatmap" xml:space="preserve">
+    <value>Lähetä rytmikartta</value>
+  </data>
+  <data name="setup_screen" xml:space="preserve">
+    <value>määritys</value>
+  </data>
+  <data name="compose_screen" xml:space="preserve">
+    <value>luo</value>
+  </data>
+  <data name="design_screen" xml:space="preserve">
+    <value>tyyli</value>
+  </data>
+  <data name="timing_screen" xml:space="preserve">
+    <value>ajoitus</value>
+  </data>
+  <data name="verify_screen" xml:space="preserve">
+    <value>vahvista</value>
+  </data>
+  <data name="playback_speed" xml:space="preserve">
+    <value>Toistonopeus</value>
+  </data>
+  <data name="test_beatmap" xml:space="preserve">
+    <value>Kokeile!</value>
+  </data>
+  <data name="rotation_unsnapped" xml:space="preserve">
+    <value>{0:0}°</value>
+  </data>
+  <data name="rotation_snapped" xml:space="preserve">
+    <value>{0:0}° (naksautettu)</value>
+  </data>
+  <data name="limit_placement_to_current_time" xml:space="preserve">
+    <value>Rajoita asettaminen nykyiseen aikaan</value>
+  </data>
+  <data name="contract_sidebars" xml:space="preserve">
+    <value>Pienennä sivupalkit osoittimen ollessa muualla</value>
+  </data>
+  <data name="must_be_in_editor_to_handle_links" xml:space="preserve">
+    <value>Sinun täytyy olla muokkaustilassa käsitelläksesi muokkaimen linkkejä</value>
+  </data>
+  <data name="failed_to_parse_edtior_link" xml:space="preserve">
+    <value>Muokkaimen linkin jäsentäminen epäonnistui</value>
+  </data>
+  <data name="timeline" xml:space="preserve">
+    <value>Aikajana</value>
+  </data>
+  <data name="timeline_show_timing_changes" xml:space="preserve">
+    <value>Näytä ajoituksen muutokset</value>
+  </data>
+  <data name="Finish editing and import changes" xml:space="preserve">
+    <value>Viimeistele muokkaus ja tuo muutokset</value>
+  </data>
+  <data name="timeline_show_breaks" xml:space="preserve">
+    <value>Näytä tauot</value>
+  </data>
+  <data name="timeline_show_ticks" xml:space="preserve">
+    <value>Näytä pykälät</value>
+  </data>
+  <data name="bookmarks" xml:space="preserve">
+    <value>Kirjanmerkit</value>
+  </data>
+  <data name="add_bookmark" xml:space="preserve">
+    <value>Lisää kirjanmerkki</value>
+  </data>
+  <data name="remove_closest_bookmark" xml:space="preserve">
+    <value>Poista lähin kirjanmerkki</value>
+  </data>
+  <data name="seek_to_previous_bookmark" xml:space="preserve">
+    <value>Siirry edelliseen kirjanmerkkiin</value>
+  </data>
+  <data name="seek_to_next_bookmark" xml:space="preserve">
+    <value>Siirry seuraavaan kirjanmerkkiin</value>
+  </data>
+  <data name="reset_bookmarks..." xml:space="preserve">
+    <value>Nollaa kirjanmerkit...
+</value>
+  </data>
+  <data name="open_info_page" xml:space="preserve">
+    <value>Avaa rytmikartan infosivu</value>
+  </data>
+  <data name="open_discussion_page" xml:space="preserve">
+    <value>Avaa rytmikartan keskustelusivu</value>
+  </data>
+  <data name="check_current_difficulty" xml:space="preserve">
+    <value>Nykyinen vaikeustaso</value>
+  </data>
+  <data name="check_entire_beatmap_set" xml:space="preserve">
+    <value>Koko rytmikartta -sarja</value>
+  </data>
+  <data name="ruleset_not_support_saving" xml:space="preserve">
+    <value>Tämä sääntöjoukko ei tue vielä tallentamista, pahoittelut!</value>
+  </data>
+  <data name="export_failed" xml:space="preserve">
+    <value>Vienti epäonnistui!</value>
+  </data>
+  <data name="import_failed" xml:space="preserve">
+    <value>Tuonti epäonnistui!</value>
+  </data>
+  <data name="open_folder" xml:space="preserve">
+    <value>Avaa kansio</value>
+  </data>
+  <data name="external_edit_cleaning_up" xml:space="preserve">
+    <value>Siivotaan jälkiä...</value>
+  </data>
+  <data name="external_edit_exporting" xml:space="preserve">
+    <value>Viedään muokkausta varten...</value>
+  </data>
+  <data name="beatmap_mounted_externally" xml:space="preserve">
+    <value>Rytmikartta on asennettu ulkoisesti</value>
+  </data>
+  <data name="external_edit_mounted_explanation" xml:space="preserve">
+    <value>Kaikki muutokset, mukaanlukien tiedostojen lisäykset, muutokset sekä poistot, tuodaan peliin.</value>
+  </data>
+  <data name="new_combo" xml:space="preserve">
+    <value>Uusi kombo</value>
+  </data>
+  <data name="bank" xml:space="preserve">
+    <value>Tyyli</value>
+  </data>
+  <data name="normal_bank" xml:space="preserve">
+    <value>Normaali tyyli</value>
+  </data>
+  <data name="addition_bank" xml:space="preserve">
+    <value>Lisätyyli</value>
+  </data>
+  <data name="sample_volume" xml:space="preserve">
+    <value>Äänenvoimakkuus</value>
+  </data>
+  <data name="sample" xml:space="preserve">
+    <value>Sample</value>
+  </data>
+  <data name="sample_set" xml:space="preserve">
+    <value>Samplejoukko</value>
+  </data>
+  <data name="select_tool" xml:space="preserve">
+    <value>Valitse</value>
+  </data>
+  <data name="synchronise" xml:space="preserve">
+    <value>Synkronoi...</value>
+  </data>
+  <data name="seek_backwards" xml:space="preserve">
+    <value>Siirry taaksepäin</value>
+  </data>
+  <data name="seek_forwards" xml:space="preserve">
+    <value>Siirry eteenpäin</value>
+  </data>
+  <data name="seek_to_previous_timing_point" xml:space="preserve">
+    <value>Siirry edelliseen ajoituspisteeseen</value>
+  </data>
+  <data name="seek_to_next_timing_point" xml:space="preserve">
+    <value>Siirry seuraavaan ajoituspisteeseen</value>
+  </data>
+  <data name="seek_to_start" xml:space="preserve">
+    <value>Siirry ensimmäiseen objektiin / kappaleen alkuun</value>
+  </data>
+  <data name="play_from_start" xml:space="preserve">
+    <value>Soita kappaleen alusta</value>
+  </data>
+  <data name="toggle_pause" xml:space="preserve">
+    <value>Aseta tauko</value>
+  </data>
+  <data name="seek_to_end" xml:space="preserve">
+    <value>Siirry viimeiseen objektiin / kappaleen loppuun</value>
+  </data>
+  <data name="toggle_new_combo" xml:space="preserve">
+    <value>Uusi kombo päälle/pois</value>
+  </data>
+  <data name="toggle_whistle_sound" xml:space="preserve">
+    <value>Vihellysääni päälle/pois</value>
+  </data>
+  <data name="toggle_finish_sound" xml:space="preserve">
+    <value>Lopetusääni päälle/pois</value>
+  </data>
+  <data name="toggle_clap_sound" xml:space="preserve">
+    <value>Taputusääni päälle/pois</value>
+  </data>
+  <data name="toggle_normal_auto_bank" xml:space="preserve">
+    <value>Aseta normaali äänipankki muotoon automaattinen</value>
+  </data>
+  <data name="toggle_normal_normal_bank" xml:space="preserve">
+    <value>Aseta normaali äänipankki muotoon normaali</value>
+  </data>
+  <data name="toggle_normal_soft_bank" xml:space="preserve">
+    <value>Aseta normaali äänipankki muotoon pehmeä</value>
+  </data>
+  <data name="toggle_normal_drum_bank" xml:space="preserve">
+    <value>Aseta normaali äänipankki muotoon rumpu</value>
+  </data>
+  <data name="toggle_addition_auto_bank" xml:space="preserve">
+    <value>Aseta lisääänipankki muotoon automaattinen</value>
+  </data>
+  <data name="toggle_addition_normal_bank" xml:space="preserve">
+    <value>Aseta lisääänipankki muotoon normaali</value>
+  </data>
+  <data name="toggle_addition_soft_bank" xml:space="preserve">
+    <value>Aseta lisääänipankki muotoon pehmeä</value>
+  </data>
+  <data name="toggle_addition_drum_bank" xml:space="preserve">
+    <value>Aseta lisääänipankki muotoon rumpu</value>
+  </data>
+  <data name="toggle_distance_snap" xml:space="preserve">
+    <value>Ota käyttöön/poista käytöstä etäisyyden kohdistusruudukko</value>
+  </data>
+</root>

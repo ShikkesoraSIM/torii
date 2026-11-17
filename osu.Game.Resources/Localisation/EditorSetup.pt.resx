@@ -1,0 +1,220 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string"/>
+              <xsd:attribute name="type" type="xsd:string"/>
+              <xsd:attribute name="mimetype" type="xsd:string"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string"/>
+              <xsd:attribute name="name" type="xsd:string"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+              <xsd:attribute ref="xml:space"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="beatmap_setup" xml:space="preserve">
+    <value>Configuração do mapa</value>
+  </data>
+  <data name="beatmap_setup_description" xml:space="preserve">
+    <value>Alterar as definições gerais do seu mapa</value>
+  </data>
+  <data name="colours_header" xml:space="preserve">
+    <value>Cores</value>
+  </data>
+  <data name="accent_colours_in_beatmap_background" xml:space="preserve">
+    <value>Cores de destaque do fundo do mapa:</value>
+  </data>
+  <data name="hit_circle_slider_combos" xml:space="preserve">
+    <value>Combinações de acertos de círculos/deslizadores</value>
+  </data>
+  <data name="design_header" xml:space="preserve">
+    <value>Aspeto</value>
+  </data>
+  <data name="enable_countdown" xml:space="preserve">
+    <value>Ativar contagem decrescente</value>
+  </data>
+  <data name="countdown_description" xml:space="preserve">
+    <value>Se ativado, será inserida uma contagem decrescente "Pronto? 3, 2, 1, VÁ!" no início do mapa, caso exista tempo suficiente para isso.</value>
+  </data>
+  <data name="countdown_speed" xml:space="preserve">
+    <value>Velocidade da contagem decrescente</value>
+  </data>
+  <data name="countdown_offset_description" xml:space="preserve">
+    <value>Se a contagem regressiva parecer fora do prazo, use-o para fazer parecer uma ou mais batidas mais cedo.</value>
+  </data>
+  <data name="countdown_offset" xml:space="preserve">
+    <value>Desvio da contagem decrescente</value>
+  </data>
+  <data name="widescreen_support" xml:space="preserve">
+    <value>Suporte para ecrã panorâmico</value>
+  </data>
+  <data name="widescreen_support_description" xml:space="preserve">
+    <value>Permite que as sequências gráficas utilizem todo o espaço do ecrã, em vez de ficarem limitadas a uma área 4:3.</value>
+  </data>
+  <data name="epilepsy_warning" xml:space="preserve">
+    <value>Aviso de epilepsia</value>
+  </data>
+  <data name="epilepsy_warning_description" xml:space="preserve">
+    <value>Recomendado se a sequência gráfica ou o vídeo contiverem cenas com cores a piscar rapidamente.</value>
+  </data>
+  <data name="letterbox_during_breaks" xml:space="preserve">
+    <value>Faixas pretas durante as pausas</value>
+  </data>
+  <data name="letterbox_during_breaks_description" xml:space="preserve">
+    <value>Adiciona faixas pretas horizontais para dar um aspeto cinematográfico durante as pausas.</value>
+  </data>
+  <data name="samples_match_playback_rate" xml:space="preserve">
+    <value>Amostras correspondem à taxa de reprodução</value>
+  </data>
+  <data name="samples_match_playback_rate_description" xml:space="preserve">
+    <value>Quando ativada, todas as amostras acelerarão ou abrandarão quando forem usadas modificações que alteram a velocidade.</value>
+  </data>
+  <data name="circle_size_description" xml:space="preserve">
+    <value>O tamanho de todos os objetos de jogo</value>
+  </data>
+  <data name="drain_rate_description" xml:space="preserve">
+    <value>A taxa de perda de vida passiva durante o tempo de jogo</value>
+  </data>
+  <data name="approach_rate_description" xml:space="preserve">
+    <value>A velocidade a que os objetos são apresentados ao jogador</value>
+  </data>
+  <data name="overall_difficulty_description" xml:space="preserve">
+    <value>A rigidez das janelas de acerto e a dificuldade dos objetos especiais (i.e., rodas)</value>
+  </data>
+  <data name="tick_rate" xml:space="preserve">
+    <value>Taxa de subdivisões</value>
+  </data>
+  <data name="tick_rate_description" xml:space="preserve">
+    <value>Determina quantas subdivisões são geradas em objetos longos. Uma taxa de  subdivisões de 1 gera uma subdivisão por batida, 2 gera duas por batida, etc.</value>
+  </data>
+  <data name="base_velocity" xml:space="preserve">
+    <value>Velocidade base</value>
+  </data>
+  <data name="base_velocity_description" xml:space="preserve">
+    <value>A velocidade base do mapa, que afeta elementos como a velocidade dos deslizadores e a velocidade de deslocamento em alguns modos de jogo.</value>
+  </data>
+  <data name="metadata_header" xml:space="preserve">
+    <value>Metadados</value>
+  </data>
+  <data name="romanised_artist" xml:space="preserve">
+    <value>Artista Romanizado</value>
+  </data>
+  <data name="romanised_title" xml:space="preserve">
+    <value>Título Romanizado</value>
+  </data>
+  <data name="creator" xml:space="preserve">
+    <value>Criador</value>
+  </data>
+  <data name="source" xml:space="preserve">
+    <value>Fonte</value>
+  </data>
+  <data name="difficulty_name" xml:space="preserve">
+    <value>Nome da dificuldade</value>
+  </data>
+  <data name="resources_header" xml:space="preserve">
+    <value>Recursos</value>
+  </data>
+  <data name="audio_track" xml:space="preserve">
+    <value>Faixa de Áudio</value>
+  </data>
+  <data name="video" xml:space="preserve">
+    <value>Vídeo</value>
+  </data>
+  <data name="video_hint" xml:space="preserve">
+    <value>O vídeo será usado no lugar do fundo estático, se estiver presente. São oferecidos downloads de beatmaps com e sem vídeo, portanto, se adicionar um vídeo, também deverá ser fornecido um plano de fundo correspondente.</value>
+  </data>
+  <data name="custom_sample_sets" xml:space="preserve">
+    <value>Conjunto de sons personalizado</value>
+  </data>
+  <data name="click_to_select_track" xml:space="preserve">
+    <value>Clique para selecionar uma faixa</value>
+  </data>
+  <data name="click_to_select_video" xml:space="preserve">
+    <value>Clique para selecionar um vídeo</value>
+  </data>
+  <data name="click_to_select_background" xml:space="preserve">
+    <value>Clique para selecionar uma imagem de fundo</value>
+  </data>
+  <data name="application_scope_selection_title" xml:space="preserve">
+    <value>Aplicar esta alteração a todas as dificuldades?</value>
+  </data>
+  <data name="apply_to_all_difficulties" xml:space="preserve">
+    <value>Aplicar a todas as dificuldades</value>
+  </data>
+  <data name="apply_to_this_difficulty" xml:space="preserve">
+    <value>Aplicar somente a esta dificuldade</value>
+  </data>
+  <data name="sync_metadata_with_all_difficulties" xml:space="preserve">
+    <value>Sincronizar metadados com todas as dificuldades</value>
+  </data>
+  <data name="sync_metadata_with_all_difficulties_tooltip" xml:space="preserve">
+    <value>Copia o artista, o título, a fonte e as etiquetas para todas as dificuldades.</value>
+  </data>
+  <data name="ruleset" xml:space="preserve">
+    <value>Modos de jogo ({0})</value>
+  </data>
+  <data name="combo_colour_prefix" xml:space="preserve">
+    <value>Combinação</value>
+  </data>
+  <data name="artist" xml:space="preserve">
+    <value>Artista</value>
+  </data>
+  <data name="title" xml:space="preserve">
+    <value>Título</value>
+  </data>
+  <data name="difficulty_header" xml:space="preserve">
+    <value>Dificuldade</value>
+  </data>
+  <data name="drag_to_set_background" xml:space="preserve">
+    <value>Arraste uma imagem para aqui para definir o fundo do mapa!</value>
+  </data>
+  <data name="drag_to_set_video" xml:space="preserve">
+    <value>Arraste o vídeo aqui para definir o vídeo do beatmap!</value>
+  </data>
+</root>

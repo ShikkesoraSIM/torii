@@ -1,0 +1,21 @@
+Twotoned by danatationn
+https://github.com/danatationn/twotoned
+Revision: ed203b11f344f730e1c0152106e64ecbca375b79
+
+Included: menu-button-background, songselect-top, songselect-bottom and
+selection-tab (PNG, both standard and @2x resolutions).
+The author declares the skin graphics under WTFPL version 2.
+No sounds, fonts, slider bar, or other third-party assets are included here.
+
+DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+Version 2, December 2004
+Copyright (C) 2004 Sam Hocevar <sam@hocevar.net>
+
+Everyone is permitted to copy and distribute verbatim or modified
+copies of this license document, and changing it is allowed as long
+as the name is changed.
+
+DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+
+0. You just DO WHAT THE FUCK YOU WANT TO.

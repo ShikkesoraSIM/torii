@@ -1,0 +1,283 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="all_read" xml:space="preserve">
+    <value>Všetky upozornenia prečítané!</value>
+  </data>
+  <data name="delete" xml:space="preserve">
+    <value>Vymazať {0}</value>
+  </data>
+  <data name="loading" xml:space="preserve">
+    <value>Načítavanie neprečítaných notifikácií...</value>
+  </data>
+  <data name="mark_read" xml:space="preserve">
+    <value>Vyčistiť {0}</value>
+  </data>
+  <data name="none" xml:space="preserve">
+    <value>Žiadne upozornenia</value>
+  </data>
+  <data name="see_all" xml:space="preserve">
+    <value>zobraziť všetky upozornenia</value>
+  </data>
+  <data name="see_channel" xml:space="preserve">
+    <value>prejsť ku konverzáciám</value>
+  </data>
+  <data name="verifying" xml:space="preserve">
+    <value>Prosím verifikuj reláciu na zobrazenie oznámení</value>
+  </data>
+  <data name="action_type._" xml:space="preserve">
+    <value>všetko</value>
+  </data>
+  <data name="action_type.beatmapset" xml:space="preserve">
+    <value>beatmapy</value>
+  </data>
+  <data name="action_type.build" xml:space="preserve">
+    <value>verzie</value>
+  </data>
+  <data name="action_type.channel" xml:space="preserve">
+    <value>chat</value>
+  </data>
+  <data name="action_type.forum_topic" xml:space="preserve">
+    <value>fórum</value>
+  </data>
+  <data name="action_type.news_post" xml:space="preserve">
+    <value>novinky</value>
+  </data>
+  <data name="action_type.team" xml:space="preserve">
+    <value>tím</value>
+  </data>
+  <data name="action_type.user" xml:space="preserve">
+    <value>profil</value>
+  </data>
+  <data name="filters._" xml:space="preserve">
+    <value>všetko</value>
+  </data>
+  <data name="filters.beatmapset" xml:space="preserve">
+    <value>beatmapy</value>
+  </data>
+  <data name="filters.build" xml:space="preserve">
+    <value>verzie</value>
+  </data>
+  <data name="filters.channel" xml:space="preserve">
+    <value>konverzácie</value>
+  </data>
+  <data name="filters.forum_topic" xml:space="preserve">
+    <value>fórum</value>
+  </data>
+  <data name="filters.news_post" xml:space="preserve">
+    <value>novinky</value>
+  </data>
+  <data name="filters.team" xml:space="preserve">
+    <value>tím</value>
+  </data>
+  <data name="filters.user" xml:space="preserve">
+    <value>profil</value>
+  </data>
+  <data name="item.beatmapset._" xml:space="preserve">
+    <value>Beatmapa</value>
+  </data>
+  <data name="item.beatmapset.beatmap_owner_change._" xml:space="preserve">
+    <value>Obtiažnosť hosťa</value>
+  </data>
+  <data name="item.beatmapset.beatmap_owner_change.beatmap_owner_change" xml:space="preserve">
+    <value>Stali ste sa majiteľom obtiažnosti "{0}" pre beatmapu "{1}"</value>
+  </data>
+  <data name="item.beatmapset.beatmap_owner_change.beatmap_owner_change_compact" xml:space="preserve">
+    <value>Stali ste sa majiteľom obtiažnosti "{0}"</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion._" xml:space="preserve">
+    <value>Diskusia o beatmape</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_lock" xml:space="preserve">
+    <value>Diskusia o "{0}" bola uzamknutá</value>
+  </data>
+  <data name="item.beatmapset.beatmapset_discussion.beatmapset_discussion_lock_compact" xml:space="preserve">
+    <value>Diskusia bola uzamknutá</value>
+  </data>
+  <data name="item.channel._" xml:space="preserve">
+    <value>Konverzácia</value>
+  </data>
+  <data name="item.channel.announcement.announce.channel_announcement_compact" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+  <data name="item.channel.channel._" xml:space="preserve">
+    <value>Nová správa</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message" xml:space="preserve">
+    <value>{0} píše "{1}"</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message_compact" xml:space="preserve">
+    <value>{0}</value>
+  </data>
+  <data name="item.channel.channel.pm.channel_message_group" xml:space="preserve">
+    <value>od {0}</value>
+  </data>
+  <data name="item.channel.channel_mention._" xml:space="preserve">
+    <value>Spomienka v chate</value>
+  </data>
+  <data name="item.channel.channel_mention.public.channel_mention" xml:space="preserve">
+    <value>{0} ťa spomenul v {1} "{2}"</value>
+  </data>
+  <data name="item.channel.channel_mention.public.channel_mention_compact" xml:space="preserve">
+    <value>{0} "{1}"</value>
+  </data>
+  <data name="item.channel.channel_mention.public.channel_mention_group" xml:space="preserve">
+    <value>spomenutý v {0}</value>
+  </data>
+  <data name="item.channel.channel_team._" xml:space="preserve">
+    <value>Nová tímová správa</value>
+  </data>
+  <data name="item.channel.channel_team.team.channel_team" xml:space="preserve">
+    <value>{0} píše "{1}"</value>
+  </data>
+  <data name="item.channel.channel_team.team.channel_team_compact" xml:space="preserve">
+    <value>{0} píše "{1}"</value>
+  </data>
+  <data name="item.channel.channel_team.team.channel_team_group" xml:space="preserve">
+    <value>{0} píše "{1}"</value>
+  </data>
+  <data name="item.build._" xml:space="preserve">
+    <value>Zoznam zmien</value>
+  </data>
+  <data name="item.build.comment._" xml:space="preserve">
+    <value>Nový komentár</value>
+  </data>
+  <data name="item.news_post._" xml:space="preserve">
+    <value>Novinky</value>
+  </data>
+  <data name="item.news_post.comment._" xml:space="preserve">
+    <value>Nový komentár</value>
+  </data>
+  <data name="item.user_achievement._" xml:space="preserve">
+    <value>Medaile</value>
+  </data>
+  <data name="item.user_achievement.user_achievement_unlock._" xml:space="preserve">
+    <value>Nová medaila</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_post_new" xml:space="preserve">
+    <value>Diskusia o "{0}" má nové aktualizácie</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_discussion.beatmapset_discussion_unlock" xml:space="preserve">
+    <value>Diskusia o "{0}" bola odomknutá</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_problem.beatmapset_discussion_qualified_problem" xml:space="preserve">
+    <value>Bol nahlásený nový problém na "{0}"</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_disqualify" xml:space="preserve">
+    <value>"{0}" bola diskvalifikovaná</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_love" xml:space="preserve">
+    <value>"{0}" bola povýšená na milovanú</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_nominate" xml:space="preserve">
+    <value>"{0}" bola nominovaná</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_qualify" xml:space="preserve">
+    <value>"{0}" dostala dostatok nominácií a vstúpila do radu na hodnotenie</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_rank" xml:space="preserve">
+    <value>"{0}" bola hodnotená</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_remove_from_loved" xml:space="preserve">
+    <value>"{0}" bola odstránená z milovaných</value>
+  </data>
+  <data name="mail.beatmapset.beatmapset_state.beatmapset_reset_nominations" xml:space="preserve">
+    <value>Nominácia "{0}" bola obnovená</value>
+  </data>
+  <data name="mail.beatmapset.comment.comment_new" xml:space="preserve">
+    <value>Beatmapa "{0}" má nové komentáre</value>
+  </data>
+  <data name="mail.channel.announcement.channel_announcement" xml:space="preserve">
+    <value>Nový oznam v "{0}"</value>
+  </data>
+  <data name="mail.channel.channel.channel_message" xml:space="preserve">
+    <value>Dostal si novú správu od "{0}"</value>
+  </data>
+  <data name="mail.channel.channel_mention.channel_mention" xml:space="preserve">
+    <value>{0} ťa spomenul v {1} "{2}"</value>
+  </data>
+  <data name="mail.channel.channel_team.channel_team" xml:space="preserve">
+    <value>Nová správa v tíme "{0}"</value>
+  </data>
+  <data name="mail.build.comment.comment_new" xml:space="preserve">
+    <value>Zoznam zmien "{0}" má nové komentáre</value>
+  </data>
+  <data name="mail.news_post.comment.comment_new" xml:space="preserve">
+    <value>Novinky "{0}" majú nové komentáre</value>
+  </data>
+  <data name="mail.forum_topic.forum_topic_reply.forum_topic_reply" xml:space="preserve">
+    <value>Nové odpovede v "{0}"</value>
+  </data>
+  <data name="mail.team.team_application.team_application_accept" xml:space="preserve">
+    <value>Od teraz si členom tímu {0}</value>
+  </data>
+  <data name="mail.team.team_application.team_application_reject" xml:space="preserve">
+    <value>Tvoja žiadosť o pripojenie do tímu {0} bola zamietnutá</value>
+  </data>
+  <data name="mail.team.team_application.team_application_store" xml:space="preserve">
+    <value>{0} požiadal o pripojenie do tvojho tímu</value>
+  </data>
+  <data name="mail.user.user_beatmapset_new.user_beatmapset_new" xml:space="preserve">
+    <value>{0} vytvoril nové beatmapy</value>
+  </data>
+  <data name="mail.user.user_beatmapset_new.user_beatmapset_revive" xml:space="preserve">
+    <value>{0} oživil beatmapy</value>
+  </data>
+</root>

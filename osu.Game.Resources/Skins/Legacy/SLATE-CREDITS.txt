@@ -1,0 +1,13 @@
+Slate by XetThe, licensed under Creative Commons Attribution 4.0 International.
+https://github.com/XetThe/osu-slate
+Source revision: f29d938d6a6cbf4a1b5d82f7767f91a312076302
+https://creativecommons.org/licenses/by/4.0/
+Full terms: SLATE-LICENSE.txt
+
+Torii adaptations: exported cached raster layers from the Photoshop sources;
+used only the Top group of ranking-panel; mapped main-* digits to score-*;
+used selection hover buttons for their idle variants too. The complete
+song-select decoration and its full-screen hit regions were not imported.
+SLATE-ASSETS.json lists the exported layers and source PSDs.
+
+Local prototype only; not a full conversion of every skin element.
