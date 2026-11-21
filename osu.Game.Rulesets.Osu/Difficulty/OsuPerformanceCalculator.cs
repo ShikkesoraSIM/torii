@@ -132,8 +132,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (score.Mods.Any(m => m is OsuModNoFail))
                 multiplier *= Math.Max(0.90, 1.0 - 0.02 * effectiveMissCount);
+            if (score.Mods.Any(m => m is OsuModSpunOut) && totalHits > 0)
+                multiplier *= 1.0 - Math.Pow((double)osuAttributes.SpinnerCount / totalHits, 0.85);
 
-            if(score.Mods.Any(h => h is OsuModRelax))
+                if (score.Mods.Any(h => h is OsuModRelax))
             {
                 // Maximum achievable OD (OD 11 + DTx2 = 12.17, matching the theoretical upper bound in osu!lazer)
                 const double maxAchievableOd = 12.17;
