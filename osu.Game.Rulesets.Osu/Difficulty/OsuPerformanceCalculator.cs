@@ -133,33 +133,32 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (score.Mods.Any(m => m is OsuModNoFail))
                 multiplier *= Math.Max(0.90, 1.0 - 0.02 * effectiveMissCount);
 
-            // OD handling rework
-            // Adjusts virtual miss weights for Ok/Meh hits under Relax mod.
-            // Below OD 10: Gradually increases penalties to prevent low-OD exploit abuse.
-            // Above OD 10: Rapidly scales down the penalty to protect high-OD maps (e.g., OD 11.1), smoothly reaching 0 at OD 13.33.
+            if (score.Mods.Any(m => m is OsuModSpunOut) && totalHits > 0)
+                multiplier *= 1.0 - Math.Pow((double)osuAttributes.SpinnerCount / totalHits, 0.85);
+
             if (score.Mods.Any(h => h is OsuModRelax))
             {
-                double safeOD = Math.Max(0.0, overallDifficulty);
-                double penaltyScale;
+                // Maximum achievable OD (OD 11 + DTx2 = 12.17, matching the theoretical upper bound in osu!lazer)
+                const double maxAchievableOd = 12.17;
 
-                if (safeOD <= 10.0)
-                {
-                    double odDiff = 10.0 - safeOD;
-                    penaltyScale = 1.0 + (odDiff * 0.2) + Math.Pow(odDiff, 1.3) * 0.1;
-                }
-                else
-                {
-                    double odExcess = safeOD - 10.0;
-                    double progress = Math.Clamp(odExcess / 3.33, 0.0, 1.0);
+                // Continuous OD debuff scaling down from the maximum achievable OD (12.17)
+                double clampedOd = Math.Clamp(overallDifficulty, 0.0, maxAchievableOd);
+                double odDeficit = maxAchievableOd - clampedOd;
+                double odFactor = Math.Exp(-0.075 * Math.Pow(odDeficit, 1.55));
 
-                    penaltyScale = 1.0 * Math.Max(0.0, 1.0 - Math.Pow(progress, 0.25));
-                }
+                // Continuous accuracy debuff scaling down from 100% (1.0)
+                double accDeficit = (1.0 - Math.Clamp(accuracy, 0.0, 1.0)) * 100.0;
+                double accFactor = Math.Exp(-0.014 * Math.Pow(accDeficit, 1.42));
 
-                double okMultiplier = 0.75 * penaltyScale;
-                double mehMultiplier = 1.0 * penaltyScale;
+                // Object count weight: shorter maps amplify the penalty, longer maps slightly mitigate it
+                double objectCountWeight = totalHits > 0
+                    ? Math.Clamp(Math.Pow(1000.0 / totalHits, 0.25), 0.75, 1.45)
+                    : 1.0;
 
-                // As we're adding Oks and Mehs to an approximated number of combo breaks the result can be higher than total hits in specific scenarios (which breaks some calculations) so we need to clamp it.
-                effectiveMissCount = Math.Min(effectiveMissCount + countOk * okMultiplier + countMeh * mehMultiplier, totalHits);
+                double rawPenalty = 1.0 - (odFactor * accFactor);
+                double scaledPenalty = Math.Clamp(rawPenalty * objectCountWeight, 0.0, 0.95);
+
+                multiplier *= 1.0 - scaledPenalty;
             }
 
             speedDeviation = calculateSpeedDeviation(osuAttributes);
@@ -241,36 +240,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             aimValue *= accuracy;
-            //OD based CS rework
-            // Applies an additional accuracy-based aim nerf for high-CS maps under Relax mod, active exclusively at OD <= 10.
-            if (score.Mods.Any(m => m is OsuModRelax))
-            {
-                var difficulty = score.BeatmapInfo!.Difficulty.Clone();
-                score.Mods.OfType<IApplicableToDifficulty>().ForEach(m => m.ApplyToDifficulty(difficulty));
-                double circleSize = difficulty.CircleSize;
-
-                double relaxNerfMultiplier = 1.0;
-                double safeOD = Math.Max(0.0, overallDifficulty);
-
-                if (circleSize > 4.5 && safeOD <= 10.0)
-                {
-                    double baseExponent = 3.0 + (circleSize * 1.7);
-                    double baseNerf = Math.Pow(accuracy, baseExponent);
-
-                    double odDeficit = 10.0 - safeOD;
-                    double harshness = 2.5 + (odDeficit * 2.0);
-                    double harshNerf = Math.Pow(baseNerf, harshness);
-                    double odPenaltyFactor = Math.Pow(0.4, odDeficit);
-
-                    relaxNerfMultiplier *= Math.Max(0.000000001, harshNerf * odPenaltyFactor);
-                }
-
-                aimValue *= relaxNerfMultiplier;
-            }
 
             return aimValue;
         }
-
 
         private double computeSpeedValue(ScoreInfo score, OsuDifficultyAttributes attributes)
         {
