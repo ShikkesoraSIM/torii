@@ -47,8 +47,21 @@ if ($LASTEXITCODE -ne 0) { throw 'Could not enable compression for build staging
 python -m unittest discover -s .github/scripts -p 'test_release_contract.py' -v
 if ($LASTEXITCODE -ne 0) { throw 'Release contract tests failed' }
 $hashes = @{}
-& $dotnet test osu.Game.Tests/osu.Game.Tests.csproj -c Debug --filter 'FullyQualifiedName~ToriiStableUITest' -v quiet
-if ($LASTEXITCODE -ne 0) { throw 'Classic UI configuration regressions; publication blocked' }
+& $dotnet build osu.Game.Tests/osu.Game.Tests.csproj -c Debug -v quiet
+if ($LASTEXITCODE -ne 0) { throw 'Classic UI test build failed; publication blocked' }
+$testRuntimeRoot = Join-Path $env:ProgramFiles 'dotnet'
+$testDotnet = Join-Path $testRuntimeRoot 'dotnet.exe'
+$testAssembly = (Resolve-Path 'osu.Game.Tests/bin/Debug/net10.0/osu.Game.Tests.dll').Path
+# El testhost sigue en net10; no usar el global.json de Nova para ejecutarlo.
+Push-Location $env:TEMP
+try {
+    $env:DOTNET_ROOT = $testRuntimeRoot
+    & $testDotnet test $testAssembly --filter 'FullyQualifiedName~ToriiStableUITest'
+    if ($LASTEXITCODE -ne 0) { throw 'Classic UI configuration regressions; publication blocked' }
+} finally {
+    $env:DOTNET_ROOT = $sdk
+    Pop-Location
+}
 $title = if ($version.EndsWith('-nova')) { 'Torii Nova' } else { 'Torii' }
 $desktopRids = if ($androidOnly) { @() } else { $rids }
 foreach ($rid in $desktopRids) {
