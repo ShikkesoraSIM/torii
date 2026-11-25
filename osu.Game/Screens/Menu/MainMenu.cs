@@ -112,16 +112,22 @@ namespace osu.Game.Screens.Menu
         private FillFlowContainer bottomElementsFlow;
         private SupporterDisplay supporterDisplay;
 
+        [Resolved]
+        private BackgroundEditorOverlay backgroundEditor { get; set; } = null!;
+
         private Sample reappearSampleSwoosh;
 
         [Resolved(canBeNull: true)]
         private SkinEditorOverlay skinEditor { get; set; }
 
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
         [CanBeNull]
         private IDisposable logoProxy;
 
         [BackgroundDependencyLoader(true)]
-        private void load(BeatmapListingOverlay beatmapListing, SettingsOverlay settings, OsuConfigManager config, SessionStatics statics, AudioManager audio)
+        private void load(BeatmapListingOverlay beatmapListing, SettingsOverlay settings, SessionStatics statics, AudioManager audio)
         {
             holdDelay = config.GetBindable<double>(OsuSetting.UIHoldActivationDelay);
             loginDisplayed = statics.GetBindable<bool>(Static.LoginOverlayDisplayed);
@@ -138,6 +144,11 @@ namespace osu.Game.Screens.Menu
                     }
                 });
             }
+
+            AddInternal(new BackgroundEditorHoldTrigger
+            {
+                BeginEdit = () => backgroundEditor.Show(),
+            });
 
             AddRangeInternal(new[]
             {
@@ -257,6 +268,9 @@ namespace osu.Game.Screens.Menu
         public override void OnEntering(ScreenTransitionEvent e)
         {
             base.OnEntering(e);
+
+            ApplyToBackground(b => backgroundEditor.SetDefaultScreen(b as BackgroundScreenDefault));
+
             Buttons.FadeInFromZero(500);
 
             if (e.Last is IntroScreen && musicController.TrackLoaded)
@@ -266,7 +280,14 @@ namespace osu.Game.Screens.Menu
                 // presume the track is the current beatmap's track. not sure how correct this assumption is but it has worked until now.
                 if (!track.IsRunning)
                 {
-                    Beatmap.Value.PrepareTrackForPreview(false);
+                    bool useSpecificOffset = ThemeMusic.UseSpecificOffset(Beatmap.Value, config);
+
+                    Beatmap.Value.PrepareTrackForPreview(false, useSpecificOffset ? ThemeMusic.PREVIEW_OFFSET : null);
+
+                    // Keep the start-from-beginning choice made in the intro if the custom theme stopped before the menu was entered.
+                    if (useSpecificOffset && !config.Get<bool>(OsuSetting.ThemeMusicStartFromPreview))
+                        track.RestartPoint = 0;
+
                     track.Restart();
                 }
             }
@@ -375,6 +396,8 @@ namespace osu.Game.Screens.Menu
         {
             base.OnSuspending(e);
 
+            backgroundEditor.Hide();
+
             Buttons.State = ButtonSystemState.EnteringMode;
 
             this.FadeOut(FADE_OUT_DURATION, Easing.InSine);
@@ -395,6 +418,8 @@ namespace osu.Game.Screens.Menu
         public override void OnResuming(ScreenTransitionEvent e)
         {
             base.OnResuming(e);
+
+            ApplyToBackground(b => backgroundEditor.SetDefaultScreen(b as BackgroundScreenDefault));
 
             // Ensures any playing `ButtonSystem` samples are stopped when returning to MainMenu (as to not overlap with the 'back' sample)
             Buttons.StopSamplePlayback();

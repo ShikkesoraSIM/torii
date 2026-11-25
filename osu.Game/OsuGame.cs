@@ -60,6 +60,7 @@ using osu.Game.Online.Matchmaking;
 using osu.Game.Online.Rooms;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapListing;
+using osu.Game.Overlays.ImagePreview;
 using osu.Game.Overlays.Mods;
 using osu.Game.Overlays.Music;
 using osu.Game.Overlays.Notifications;
@@ -1669,6 +1670,7 @@ namespace osu.Game
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(wikiOverlay = new WikiOverlay(), overlayContent.Add, true);
             loadComponentSingleFile(skinEditor = new SkinEditorOverlay(ScreenContainer), overlayContent.Add, true);
+            loadComponentSingleFile(new BackgroundEditorOverlay(), overlayContent.Add, true);
 
             loadComponentSingleFile(loginOverlay = new LoginOverlay
             {
@@ -1682,6 +1684,7 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, rightFloatingOverlayContent.Add, true);
 
+            loadComponentSingleFile<IImagePreviewOverlay>(new ImagePreviewOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile(new AccountCreationOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile<IDialogOverlay>(dialogOverlay = new DialogOverlay(), topMostOverlayContent.Add, true);
             loadComponentSingleFile(new MedalOverlay(), topMostOverlayContent.Add);
@@ -2256,10 +2259,23 @@ namespace osu.Game
             if (!autoHideToolbar.Value)
                 return;
 
+            if (!IsActive.Value || OverlayActivationMode.Value == OverlayActivation.Disabled)
+            {
+                toolbarAutoHideTime = null;
+                return;
+            }
+
             // gameplay / intros dejan OverlayActivation en Disabled: ahi la toolbar no se muestra igual,
             // asi que el reveal no molesta jugando (lo bloquea Toolbar.UpdateState).
             autoHideInputManager ??= GetContainingInputManager();
-            float mouseY = autoHideInputManager?.CurrentState.Mouse.Position.Y ?? float.MaxValue;
+            if (autoHideInputManager == null)
+                return;
+
+            var mousePosition = autoHideInputManager.CurrentState.Mouse.Position;
+            float mouseY = ToLocalSpace(mousePosition).Y;
+            var toolbarPosition = Toolbar.ToLocalSpace(mousePosition);
+            bool insideToolbar = toolbarPosition.X >= 0 && toolbarPosition.X <= Toolbar.DrawWidth
+                                 && toolbarPosition.Y >= 0 && toolbarPosition.Y <= Toolbar.DrawHeight;
 
             if (mouseY <= toolbar_reveal_edge)
             {
@@ -2273,7 +2289,7 @@ namespace osu.Game
                 // regresiva. HasOpenPopup cubre lo que IsHovered no ve: el cursor sobre un boton (el
                 // hover se lo queda el boton) o sobre la tarjetita de login que cuelga mas abajo, y
                 // los popups nuestros abiertos, que esconderse los cierra en la cara del usuario.
-                if (mouseY <= Toolbar.HEIGHT || Toolbar.IsHovered || Toolbar.HasOpenPopup)
+                if (insideToolbar || Toolbar.IsHovered || Toolbar.HasOpenPopup)
                     toolbarAutoHideTime = null;
                 else
                 {
