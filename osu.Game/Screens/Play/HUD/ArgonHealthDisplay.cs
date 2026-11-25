@@ -144,6 +144,9 @@ namespace osu.Game.Screens.Play.HUD
             pendingMissAnimation |= !result.IsHit && result.HealthIncrease < 0;
         }
 
+        private double lastAppliedHealth = -1;
+        private double lastAppliedGlow = -1;
+
         protected override void Update()
         {
             base.Update();
@@ -154,14 +157,41 @@ namespace osu.Game.Screens.Play.HUD
                 drawSizeLayout.Validate();
             }
 
-            healthBarValue = Interpolation.DampContinuously(healthBarValue, Current.Value, 50, Time.Elapsed);
+            const double progress_epsilon = 1e-4;
+            const float alpha_epsilon = 1e-3f;
+
+            double targetHealth = Current.Value;
+
+            if (Math.Abs(healthBarValue - targetHealth) > progress_epsilon)
+                healthBarValue = Interpolation.DampContinuously(healthBarValue, targetHealth, 50, Time.Elapsed);
+            else
+                healthBarValue = targetHealth;
+
             if (!displayingMiss)
-                glowBarValue = Interpolation.DampContinuously(glowBarValue, Current.Value, 50, Time.Elapsed);
+            {
+                if (Math.Abs(glowBarValue - targetHealth) > progress_epsilon)
+                    glowBarValue = Interpolation.DampContinuously(glowBarValue, targetHealth, 50, Time.Elapsed);
+                else
+                    glowBarValue = targetHealth;
+            }
 
-            mainBar.Alpha = (float)Interpolation.DampContinuously(mainBar.Alpha, Current.Value > 0 ? 1 : 0, 40, Time.Elapsed);
-            glowBar.Alpha = (float)Interpolation.DampContinuously(glowBar.Alpha, glowBarValue > 0 ? 1 : 0, 40, Time.Elapsed);
+            float targetMainAlpha = targetHealth > 0 ? 1 : 0;
+            if (MathF.Abs(mainBar.Alpha - targetMainAlpha) > alpha_epsilon)
+                mainBar.Alpha = (float)Interpolation.DampContinuously(mainBar.Alpha, targetMainAlpha, 40, Time.Elapsed);
+            else if (mainBar.Alpha != targetMainAlpha)
+                mainBar.Alpha = targetMainAlpha;
 
-            updatePathProgress();
+            float targetGlowAlpha = glowBarValue > 0 ? 1 : 0;
+            if (MathF.Abs(glowBar.Alpha - targetGlowAlpha) > alpha_epsilon)
+                glowBar.Alpha = (float)Interpolation.DampContinuously(glowBar.Alpha, targetGlowAlpha, 40, Time.Elapsed);
+            else if (glowBar.Alpha != targetGlowAlpha)
+                glowBar.Alpha = targetGlowAlpha;
+
+            if (Math.Abs(healthBarValue - lastAppliedHealth) > progress_epsilon
+                || Math.Abs(glowBarValue - lastAppliedGlow) > progress_epsilon)
+            {
+                updatePathProgress();
+            }
         }
 
         protected override void HealthChanged(bool increase)
@@ -254,6 +284,8 @@ namespace osu.Game.Screens.Play.HUD
 
         private void updatePathProgress()
         {
+            lastAppliedHealth = healthBarValue;
+            lastAppliedGlow = glowBarValue;
             mainBar.ProgressRange = new Vector2(0f, (float)healthBarValue);
             glowBar.ProgressRange = new Vector2((float)healthBarValue, (float)Math.Max(glowBarValue, healthBarValue));
         }

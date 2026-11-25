@@ -162,7 +162,7 @@ namespace osu.Game.Screens.Play
 
         private void checkPlaybackValidity()
         {
-            if (!ShouldValidatePlaybackRate)
+            if (!ShouldValidatePlaybackRate || !playbackRateValid.Value)
                 return;
 
             if (GameplayClock.IsRunning)

@@ -248,12 +248,31 @@ namespace osu.Game.Rulesets.UI
         }
 
         private Mod[] mods;
+        private IUpdatableByPlayfield[] updatableMods = Array.Empty<IUpdatableByPlayfield>();
+        private IApplicableToDrawableHitObject[] dhoMods = Array.Empty<IApplicableToDrawableHitObject>();
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             mods = Mods?.ToArray();
+
+            if (mods != null)
+            {
+                var upd = new List<IUpdatableByPlayfield>();
+                var dho = new List<IApplicableToDrawableHitObject>();
+
+                for (int i = 0; i < mods.Length; i++)
+                {
+                    if (mods[i] is IUpdatableByPlayfield u)
+                        upd.Add(u);
+                    if (mods[i] is IApplicableToDrawableHitObject a)
+                        dho.Add(a);
+                }
+
+                updatableMods = upd.Count > 0 ? upd.ToArray() : Array.Empty<IUpdatableByPlayfield>();
+                dhoMods = dho.Count > 0 ? dho.ToArray() : Array.Empty<IApplicableToDrawableHitObject>();
+            }
 
             // in the case a consumer forgets to add the HitObjectContainer, we will add it here.
             if (HitObjectContainer.Parent == null)
@@ -264,13 +283,10 @@ namespace osu.Game.Rulesets.UI
         {
             base.Update();
 
-            if (!IsNested && mods != null)
+            if (!IsNested)
             {
-                foreach (Mod mod in mods)
-                {
-                    if (mod is IUpdatableByPlayfield updatable)
-                        updatable.Update(this);
-                }
+                for (int i = 0; i < updatableMods.Length; i++)
+                    updatableMods[i].Update(this);
             }
 
             // When rewinding, revert future judgements in the reverse order.
@@ -407,14 +423,8 @@ namespace osu.Game.Rulesets.UI
 
                     // If this is the first time this DHO is being used, then apply the DHO mods.
                     // This is done before Apply() so that the state is updated once when the hitobject is applied.
-                    if (mods != null)
-                    {
-                        foreach (Mod mod in mods)
-                        {
-                            if (mod is IApplicableToDrawableHitObject applicable)
-                                applicable.ApplyToDrawableHitObject(dho);
-                        }
-                    }
+                    for (int i = 0; i < dhoMods.Length; i++)
+                        dhoMods[i].ApplyToDrawableHitObject(dho);
                 }
 
                 if (!entryManager.TryGet(hitObject, out var entry))

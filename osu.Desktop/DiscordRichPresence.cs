@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Numerics;
 using System.Text;
 using DiscordRPC;
 using DiscordRPC.Message;
@@ -161,6 +162,10 @@ namespace osu.Desktop
             }, 200);
         }
 
+        private int lastButtonBeatmapId = -1;
+        private string? lastButtonRulesetShortName;
+        private Button[]? cachedBeatmapButtons;
+
         private void updatePresence(bool hideIdentifiableInformation)
         {
             if (user == null)
@@ -174,14 +179,22 @@ namespace osu.Desktop
 
                 if (userActivity.Value.GetBeatmapID(hideIdentifiableInformation) is int beatmapId && beatmapId > 0)
                 {
-                    presence.Buttons = new[]
+                    string shortName = ruleset.Value.ShortName;
+                    if (cachedBeatmapButtons == null || lastButtonBeatmapId != beatmapId || lastButtonRulesetShortName != shortName)
                     {
-                        new Button
+                        lastButtonBeatmapId = beatmapId;
+                        lastButtonRulesetShortName = shortName;
+                        cachedBeatmapButtons = new[]
                         {
-                            Label = "View beatmap",
-                            Url = $@"{api.Endpoints.WebsiteUrl}/beatmaps/{beatmapId}?mode={ruleset.Value.ShortName}"
-                        }
-                    };
+                            new Button
+                            {
+                                Label = "View beatmap",
+                                Url = $@"{api.Endpoints.WebsiteUrl}/beatmaps/{beatmapId}?mode={shortName}"
+                            }
+                        };
+                    }
+
+                    presence.Buttons = cachedBeatmapButtons;
                 }
                 else
                 {
@@ -205,7 +218,7 @@ namespace osu.Desktop
                     ID = room.RoomID.ToString(),
                     // technically lobbies can have infinite users, but Discord needs this to be set to something.
                     // to make party display sensible, assign a powers of two above participants count (8 at minimum).
-                    Max = (int)Math.Max(8, Math.Pow(2, Math.Ceiling(Math.Log2(room.Users.Count)))),
+                    Max = (int)BitOperations.RoundUpToPowerOf2((uint)Math.Max(8, room.Users.Count)),
                     Size = room.Users.Count,
                 };
 

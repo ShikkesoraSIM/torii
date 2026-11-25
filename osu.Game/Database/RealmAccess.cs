@@ -810,20 +810,34 @@ namespace osu.Game.Database
             }
         }
 
+        private RealmConfiguration? defaultConfiguration;
+
         private RealmConfiguration getConfiguration(string? filename = null)
         {
+            if (filename == null)
+            {
+                var cached = Volatile.Read(ref defaultConfiguration);
+                if (cached != null)
+                    return cached;
+            }
+
             // This is currently the only usage of temporary files at the osu! side.
             // If we use the temporary folder in more situations in the future, this should be moved to a higher level (helper method or OsuGameBase).
             string tempPathLocation = Path.Combine(Path.GetTempPath(), @"lazer");
             if (!Directory.Exists(tempPathLocation))
                 Directory.CreateDirectory(tempPathLocation);
 
-            return new RealmConfiguration(storage.GetFullPath(filename ?? Filename, true))
+            var config = new RealmConfiguration(storage.GetFullPath(filename ?? Filename, true))
             {
                 SchemaVersion = schema_version,
                 MigrationCallback = onMigration,
                 FallbackPipePath = tempPathLocation,
             };
+
+            if (filename == null)
+                Volatile.Write(ref defaultConfiguration, config);
+
+            return config;
         }
 
         private void onMigration(Migration migration, ulong lastSchemaVersion)

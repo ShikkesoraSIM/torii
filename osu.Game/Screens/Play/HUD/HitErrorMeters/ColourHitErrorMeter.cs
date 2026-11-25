@@ -115,10 +115,24 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
 
             private void removeExtraJudgements()
             {
-                var remainingChildren = Children.Where(c => !c.IsRemoved);
+                int limit = JudgementCount.Value;
+                int liveCount = 0;
 
-                while (remainingChildren.Count() > JudgementCount.Value)
-                    remainingChildren.First().Remove();
+                for (int i = 0; i < Children.Count; i++)
+                {
+                    if (!Children[i].IsRemoved)
+                        liveCount++;
+                }
+
+                for (int i = 0; i < Children.Count && liveCount > limit; i++)
+                {
+                    var child = Children[i];
+                    if (child.IsRemoved)
+                        continue;
+
+                    child.Remove();
+                    liveCount--;
+                }
             }
 
             private void updateMetrics()

@@ -362,9 +362,10 @@ namespace osu.Game.Skinning
                     // ..or in some cases 2 (https://github.com/ppy/osu/issues/18579).
                     if (typeof(TValue) == typeof(bool))
                     {
-                        val = bool.TryParse(val, out bool boolVal)
-                            ? Convert.ChangeType(boolVal, typeof(bool)).ToString()
-                            : Convert.ChangeType(Convert.ToInt32(val), typeof(bool)).ToString();
+                        if (!bool.TryParse(val, out bool boolVal))
+                            boolVal = Convert.ToInt32(val) != 0;
+
+                        val = boolVal ? bool.TrueString : bool.FalseString;
                     }
 
                     var bindable = new Bindable<TValue>();
@@ -499,9 +500,11 @@ namespace osu.Game.Skinning
                     return null;
 
                 case SkinComponentLookup<HitResult> resultComponent:
+                {
+                    if (!judgementAnimationAvailability.TryGetValue(resultComponent.Component, out bool hasAnimation))
+                        judgementAnimationAvailability[resultComponent.Component] = hasAnimation = getJudgementAnimation(resultComponent.Component) != null;
 
-                    // kind of wasteful that we throw this away, but should do for now.
-                    if (getJudgementAnimation(resultComponent.Component) != null)
+                    if (hasAnimation)
                     {
                         // TODO: this should be inside the judgement pieces.
                         Func<Drawable> createDrawable = () => getJudgementAnimation(resultComponent.Component).AsNonNull();
@@ -515,10 +518,13 @@ namespace osu.Game.Skinning
                     }
 
                     return null;
+                }
             }
 
             return base.GetDrawableComponent(lookup);
         }
+
+        private readonly Dictionary<HitResult, bool> judgementAnimationAvailability = new Dictionary<HitResult, bool>();
 
         private Texture? getParticleTexture(HitResult result)
         {
@@ -589,9 +595,15 @@ namespace osu.Game.Skinning
                 // some component names (especially user-controlled ones, like `HitX` in mania)
                 // may contain `@2x` scale specifications.
                 // stable happens to check for that and strip them, so do the same to match stable behaviour.
-                componentName = componentName.Replace(@"@2x", string.Empty);
+                if (componentName.Contains("@2x", StringComparison.Ordinal))
+                    componentName = componentName.Replace("@2x", string.Empty);
 
-                string twoTimesFilename = $"{Path.ChangeExtension(componentName, null)}@2x{Path.GetExtension(componentName)}";
+                int lastDot = componentName.LastIndexOf('.');
+                int lastSlash = componentName.LastIndexOfAny(['/', '\\']);
+
+                string twoTimesFilename = lastDot > lastSlash
+                    ? string.Concat(componentName.AsSpan(0, lastDot), "@2x", componentName.AsSpan(lastDot))
+                    : string.Concat(componentName, "@2x");
 
                 texture = Textures?.Get(twoTimesFilename, wrapModeS, wrapModeT);
 
@@ -608,61 +620,65 @@ namespace osu.Game.Skinning
 
         public override ISample? GetSample(ISampleInfo sampleInfo)
         {
-            IEnumerable<string> lookupNames;
+            bool isHitsound = sampleInfo.IsHitsound;
 
             if (sampleInfo is HitSampleInfo hitSample)
-                lookupNames = getLegacyLookupNames(hitSample);
-            else
             {
-                lookupNames = sampleInfo.LookupNames.SelectMany(getFallbackSampleNames);
+                string? suffix = string.IsNullOrEmpty(hitSample.Suffix) ? null : hitSample.Suffix;
+                bool useCustomSampleBanks = UseCustomSampleBanks;
+
+                foreach (string name in hitSample.LookupNames)
+                {
+                    ISample? sample = tryHitSampleLookup(name, suffix, useCustomSampleBanks, isHitsound);
+                    if (sample != null)
+                        return sample;
+
+                    int lastSlash = name.LastIndexOf('/');
+                    if (lastSlash >= 0)
+                    {
+                        sample = tryHitSampleLookup(name[(lastSlash + 1)..], suffix, useCustomSampleBanks, isHitsound);
+                        if (sample != null)
+                            return sample;
+                    }
+                }
+
+                // also for compatibility, try falling back to non-bank samples (so-called "universal" samples) as the last resort.
+                // going forward specifying banks shall always be required, even for elements that wouldn't require it on stable,
+                // which is why this is done locally here.
+                return GetSampleFromSkinFiles(hitSample.Name, isHitsound);
             }
 
-            foreach (string lookup in lookupNames)
+            foreach (string name in sampleInfo.LookupNames)
             {
-                var sample = GetSampleFromSkinFiles(lookup, sampleInfo.IsHitsound);
-
+                ISample? sample = GetSampleFromSkinFiles(name, isHitsound);
                 if (sample != null)
-                {
                     return sample;
+
+                int lastSlash = name.LastIndexOf('/');
+                if (lastSlash >= 0)
+                {
+                    sample = GetSampleFromSkinFiles(name[(lastSlash + 1)..], isHitsound);
+                    if (sample != null)
+                        return sample;
                 }
             }
 
             return null;
         }
 
-        private IEnumerable<string> getLegacyLookupNames(HitSampleInfo hitSample)
+        private ISample? tryHitSampleLookup(string name, string? suffix, bool useCustomSampleBanks, bool isHitsound)
         {
-            var lookupNames = hitSample.LookupNames.SelectMany(getFallbackSampleNames);
-
-            if (!string.IsNullOrEmpty(hitSample.Suffix))
+            if (suffix != null)
             {
                 // for compatibility with stable:
                 // - if the skin can use custom sample banks, it MUST use the custom sample bank suffix. it is not allowed to fall back to a non-custom sound.
                 // - if the skin cannot use custom sample banks, it MUST NOT use the custom sample bank suffix.
-                // using .EndsWith() is intentional as it ensures parity in all edge cases
-                // (see LegacyTaikoSampleInfo for an example of one - prioritising the taiko prefix should still apply).
-                if (UseCustomSampleBanks)
-                    lookupNames = lookupNames.Where(name => name.EndsWith(hitSample.Suffix, StringComparison.Ordinal));
-                else
-                    lookupNames = lookupNames.Where(name => !name.EndsWith(hitSample.Suffix, StringComparison.Ordinal));
+                bool endsWithSuffix = name.EndsWith(suffix, StringComparison.Ordinal);
+                if (endsWithSuffix != useCustomSampleBanks)
+                    return null;
             }
 
-            foreach (string l in lookupNames)
-                yield return l;
-
-            // also for compatibility, try falling back to non-bank samples (so-called "universal" samples) as the last resort.
-            // going forward specifying banks shall always be required, even for elements that wouldn't require it on stable,
-            // which is why this is done locally here.
-            yield return hitSample.Name;
-        }
-
-        private IEnumerable<string> getFallbackSampleNames(string name)
-        {
-            // May be something like "Gameplay/normal-hitnormal" from lazer.
-            yield return name;
-
-            // Fall back to using the last piece for components coming from lazer (e.g. "Gameplay/normal-hitnormal" -> "normal-hitnormal").
-            yield return name.Split('/').Last();
+            return GetSampleFromSkinFiles(name, isHitsound);
         }
     }
 }

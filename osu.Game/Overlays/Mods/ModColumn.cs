@@ -30,6 +30,7 @@ namespace osu.Game.Overlays.Mods
         public readonly ModType ModType;
 
         private IReadOnlyList<ModState> availableMods = Array.Empty<ModState>();
+        private Action<ValueChangedEvent<bool>>? onModStateChanged;
 
         /// <summary>
         /// Sets the list of mods to show in this column.
@@ -41,13 +42,24 @@ namespace osu.Game.Overlays.Mods
             {
                 Debug.Assert(value.All(mod => mod.Mod.Type == ModType));
 
+                onModStateChanged ??= _ => updateState();
+
+                for (int i = 0; i < availableMods.Count; i++)
+                {
+                    var oldMod = availableMods[i];
+                    oldMod.Active.ValueChanged -= onModStateChanged;
+                    oldMod.MatchingTextFilter.ValueChanged -= onModStateChanged;
+                    oldMod.ValidForSelection.ValueChanged -= onModStateChanged;
+                }
+
                 availableMods = value;
 
-                foreach (var mod in availableMods)
+                for (int i = 0; i < availableMods.Count; i++)
                 {
-                    mod.Active.BindValueChanged(_ => updateState());
-                    mod.MatchingTextFilter.BindValueChanged(_ => updateState());
-                    mod.ValidForSelection.BindValueChanged(_ => updateState());
+                    var mod = availableMods[i];
+                    mod.Active.BindValueChanged(onModStateChanged);
+                    mod.MatchingTextFilter.BindValueChanged(onModStateChanged);
+                    mod.ValidForSelection.BindValueChanged(onModStateChanged);
                 }
 
                 updateState();
@@ -164,17 +176,29 @@ namespace osu.Game.Overlays.Mods
 
         private void updateState()
         {
-            Alpha = availableMods.All(mod => !mod.Visible) ? 0 : 1;
+            bool anyPanelsVisible = false;
+            bool allVisibleActive = true;
+
+            for (int i = 0; i < availableMods.Count; i++)
+            {
+                var mod = availableMods[i];
+                if (!mod.Visible)
+                    continue;
+
+                anyPanelsVisible = true;
+                if (!mod.Active.Value)
+                    allVisibleActive = false;
+            }
+
+            Alpha = anyPanelsVisible ? 1 : 0;
 
             if (toggleAllCheckbox != null && !SelectionAnimationRunning)
             {
-                bool anyPanelsVisible = availableMods.Any(panel => panel.Visible);
-
                 toggleAllCheckbox.Alpha = anyPanelsVisible ? 1 : 0;
 
-                // checking `anyPanelsVisible` is important since `.All()` returns `true` for empty enumerables.
+                // checking `anyPanelsVisible` is important since empty collections should not toggle on.
                 if (anyPanelsVisible)
-                    toggleAllCheckbox.Current.Value = availableMods.Where(panel => panel.Visible).All(panel => panel.Active.Value);
+                    toggleAllCheckbox.Current.Value = allVisibleActive;
             }
         }
 

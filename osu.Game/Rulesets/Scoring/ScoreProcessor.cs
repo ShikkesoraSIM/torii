@@ -255,6 +255,8 @@ namespace osu.Game.Rulesets.Scoring
             }
         }
 
+        private IApplicableToScoreProcessor[] rankAdjustingMods = Array.Empty<IApplicableToScoreProcessor>();
+
         protected virtual bool CheckScoreV1Active(IReadOnlyList<Mod> mods) => mods.Any(m => m is ModClassic);
 
         public ScoreProcessor(Ruleset ruleset)
@@ -267,6 +269,7 @@ namespace osu.Game.Rulesets.Scoring
             {
                 ScoreV2Active = e.NewValue.Any(m => m is ModScoreV2);
                 ScoreV1Active = !ScoreV2Active && CheckScoreV1Active(e.NewValue);
+                rankAdjustingMods = e.NewValue.OfType<IApplicableToScoreProcessor>().ToArray();
                 updateScoreMultiplier();
                 updateScore();
                 updateRank();
@@ -300,7 +303,7 @@ namespace osu.Game.Rulesets.Scoring
             if (result.FailedAtJudgement && !ApplyNewJudgementsWhenFailed)
                 return;
 
-            ScoreResultCounts[result.Type] = ScoreResultCounts.GetValueOrDefault(result.Type) + 1;
+            System.Runtime.InteropServices.CollectionsMarshal.GetValueRefOrAddDefault(ScoreResultCounts, result.Type, out _)++;
 
             if (result.Type.IncreasesCombo())
                 Combo.Value++;
@@ -365,7 +368,7 @@ namespace osu.Game.Rulesets.Scoring
             if (result.FailedAtJudgement && !ApplyNewJudgementsWhenFailed)
                 return;
 
-            ScoreResultCounts[result.Type] = ScoreResultCounts.GetValueOrDefault(result.Type) - 1;
+            System.Runtime.InteropServices.CollectionsMarshal.GetValueRefOrAddDefault(ScoreResultCounts, result.Type, out _)--;
 
             if (ResultAffectsAccuracy(result.Judgement.MaxResult))
             {
@@ -481,8 +484,8 @@ namespace osu.Game.Rulesets.Scoring
 
             ScoreRank newRank = RankFromScore(Accuracy.Value, ScoreResultCounts);
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToScoreProcessor>())
-                newRank = mod.AdjustRank(newRank, Accuracy.Value);
+            for (int i = 0; i < rankAdjustingMods.Length; i++)
+                newRank = rankAdjustingMods[i].AdjustRank(newRank, Accuracy.Value);
 
             rank.Value = newRank;
         }

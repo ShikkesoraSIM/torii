@@ -280,6 +280,9 @@ namespace osu.Game.Screens.Select
             configCollectionFilter.BindValueChanged(_ => updateCriteria());
             collectionsSubscription = realm.RegisterForNotifications(r => r.All<BeatmapCollection>(), (_, changeSet) =>
             {
+                cachedCollectionId = null;
+                cachedCollectionHashes = null;
+
                 if (changeSet != null && groupDropdown.Current.Value.Value == GroupMode.Collections)
                     updateCriteria();
             });
@@ -328,6 +331,9 @@ namespace osu.Game.Screens.Select
             debouncedModSettingsChange?.Cancel();
         }
 
+        private Guid? cachedCollectionId;
+        private IReadOnlyCollection<string>? cachedCollectionHashes;
+
         /// <summary>
         /// Creates a <see cref="FilterCriteria"/> based on the current state of the controls.
         /// </summary>
@@ -339,7 +345,15 @@ namespace osu.Game.Screens.Select
             IEnumerable<string>? collectionBeatmapMD5Hashes = null;
 
             if (Guid.TryParse(configCollectionFilter.Value, out var collectionId))
-                collectionBeatmapMD5Hashes = realm.Run(r => r.Find<BeatmapCollection>(collectionId)?.BeatmapMD5Hashes.ToImmutableHashSet());
+            {
+                if (collectionId != cachedCollectionId)
+                {
+                    cachedCollectionHashes = realm.Run(r => r.Find<BeatmapCollection>(collectionId)?.BeatmapMD5Hashes.ToImmutableHashSet());
+                    cachedCollectionId = collectionId;
+                }
+
+                collectionBeatmapMD5Hashes = cachedCollectionHashes;
+            }
 
             var criteria = new FilterCriteria
             {

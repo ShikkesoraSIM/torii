@@ -19,9 +19,39 @@ namespace osu.Game.Rulesets.UI
 {
     public partial class HitObjectContainer : PooledDrawableWithLifetimeContainer<HitObjectLifetimeEntry, DrawableHitObject>, IHitObjectContainer
     {
-        public IEnumerable<DrawableHitObject> Objects => InternalChildren.Cast<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime);
+        private DrawableHitObject[] sortedObjectsCache = Array.Empty<DrawableHitObject>();
+        private bool objectsDirty = true;
 
-        public IEnumerable<DrawableHitObject> AliveObjects => AliveEntries.Values.OrderBy(h => h.HitObject.StartTime);
+        private DrawableHitObject[] sortedAliveCache = Array.Empty<DrawableHitObject>();
+        private bool aliveDirty = true;
+
+        public IEnumerable<DrawableHitObject> Objects
+        {
+            get
+            {
+                if (objectsDirty)
+                {
+                    sortedObjectsCache = InternalChildren.Cast<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime).ToArray();
+                    objectsDirty = false;
+                }
+
+                return sortedObjectsCache;
+            }
+        }
+
+        public IEnumerable<DrawableHitObject> AliveObjects
+        {
+            get
+            {
+                if (aliveDirty)
+                {
+                    sortedAliveCache = AliveEntries.Values.OrderBy(h => h.HitObject.StartTime).ToArray();
+                    aliveDirty = false;
+                }
+
+                return sortedAliveCache;
+            }
+        }
 
         /// <summary>
         /// Invoked when a <see cref="DrawableHitObject"/> is judged.
@@ -88,6 +118,7 @@ namespace osu.Game.Rulesets.UI
 
         protected override void AddDrawable(HitObjectLifetimeEntry entry, DrawableHitObject drawable)
         {
+            aliveDirty = true;
             if (nonPooledDrawableMap.ContainsKey(entry)) return;
 
             addDrawable(drawable);
@@ -96,6 +127,7 @@ namespace osu.Game.Rulesets.UI
 
         protected override void RemoveDrawable(HitObjectLifetimeEntry entry, DrawableHitObject drawable)
         {
+            aliveDirty = true;
             drawable.OnKilled();
             if (nonPooledDrawableMap.ContainsKey(entry)) return;
 
@@ -105,6 +137,7 @@ namespace osu.Game.Rulesets.UI
 
         private void addDrawable(DrawableHitObject drawable)
         {
+            objectsDirty = true;
             drawable.OnNewResult += onNewResult;
 
             bindStartTime(drawable);
@@ -113,6 +146,7 @@ namespace osu.Game.Rulesets.UI
 
         private void removeDrawable(DrawableHitObject drawable)
         {
+            objectsDirty = true;
             drawable.OnNewResult -= onNewResult;
 
             unbindStartTime(drawable);
@@ -156,6 +190,9 @@ namespace osu.Game.Rulesets.UI
 
             bindable.BindValueChanged(_ =>
             {
+                aliveDirty = true;
+                objectsDirty = true;
+
                 if (LoadState >= LoadState.Ready)
                     SortInternal();
             });

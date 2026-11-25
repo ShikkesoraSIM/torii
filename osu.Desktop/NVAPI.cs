@@ -7,6 +7,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using osu.Framework.Logging;
@@ -108,27 +109,29 @@ namespace osu.Desktop
         public static bool Available { get; private set; }
 
         private static IntPtr sessionHandle;
+        private static bool? isLaptopCached;
+        private static bool? isUsingOptimusCached;
 
         public static bool IsUsingOptimusDedicatedGpu
         {
             get
             {
-                if (!Available)
-                    return false;
+                if (isUsingOptimusCached.HasValue)
+                    return isUsingOptimusCached.Value;
 
-                if (!IsLaptop)
-                    return false;
+                if (!Available || !IsLaptop)
+                    return (isUsingOptimusCached = false).Value;
 
                 IntPtr profileHandle;
                 if (!getProfile(out profileHandle, out _, out bool _))
-                    return false;
+                    return (isUsingOptimusCached = false).Value;
 
                 // Get the optimus setting
                 NvSetting setting;
                 if (!getSetting(NvSettingID.SHIM_RENDERING_MODE_ID, profileHandle, out setting))
-                    return false;
+                    return (isUsingOptimusCached = false).Value;
 
-                return (setting.U32CurrentValue & (uint)NvShimSetting.SHIM_RENDERING_MODE_ENABLE) > 0;
+                return (isUsingOptimusCached = (setting.U32CurrentValue & (uint)NvShimSetting.SHIM_RENDERING_MODE_ENABLE) > 0).Value;
             }
         }
 
@@ -136,24 +139,27 @@ namespace osu.Desktop
         {
             get
             {
+                if (isLaptopCached.HasValue)
+                    return isLaptopCached.Value;
+
                 if (!Available)
-                    return false;
+                    return (isLaptopCached = false).Value;
 
                 // Make sure that this is a laptop.
                 IntPtr[] gpus = new IntPtr[64];
                 if (checkError(EnumPhysicalGPUs(gpus, out int gpuCount), nameof(EnumPhysicalGPUs)))
-                    return false;
+                    return (isLaptopCached = false).Value;
 
                 for (int i = 0; i < gpuCount; i++)
                 {
                     if (checkError(GetSystemType(gpus[i], out var type), nameof(GetSystemType)))
-                        return false;
+                        return (isLaptopCached = false).Value;
 
                     if (type == NvSystemType.LAPTOP)
-                        return true;
+                        return (isLaptopCached = true).Value;
                 }
 
-                return false;
+                return (isLaptopCached = false).Value;
             }
         }
 
@@ -367,16 +373,15 @@ namespace osu.Desktop
 
         static NVAPI()
         {
-            // TODO: check whether gpu vendor contains NVIDIA before attempting load?
-
             try
             {
-                // Try to load NVAPI
-                if ((IntPtr.Size == 4 && loadLibrary(@"nvapi.dll") == IntPtr.Zero)
-                    || (IntPtr.Size == 8 && loadLibrary(@"nvapi64.dll") == IntPtr.Zero))
-                {
+                string dllName = IntPtr.Size == 8 ? @"nvapi64.dll" : @"nvapi.dll";
+                if (!File.Exists(Path.Combine(Environment.SystemDirectory, dllName)))
                     return;
-                }
+
+                // Try to load NVAPI
+                if (loadLibrary(dllName) == IntPtr.Zero)
+                    return;
 
                 InitializeDelegate initialize;
                 getDelegate(0x0150E828, out initialize);

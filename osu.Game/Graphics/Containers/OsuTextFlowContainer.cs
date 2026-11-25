@@ -27,7 +27,9 @@ namespace osu.Game.Graphics.Containers
         {
             private readonly IHasLineBaseHeight? lineBaseHeightSource;
 
-            public float LineBaseHeight => lineBaseHeightSource?.LineBaseHeight ?? DrawHeight;
+            public float LineBaseHeight => lineBaseHeightSource != null && Child.IsLoaded && Child.IsPresent
+                ? lineBaseHeightSource.LineBaseHeight
+                : DrawHeight;
 
             public ArbitraryDrawableWrapper(Drawable drawable)
             {

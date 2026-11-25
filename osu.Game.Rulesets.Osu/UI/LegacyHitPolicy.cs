@@ -38,12 +38,29 @@ namespace osu.Game.Rulesets.Osu.UI
             if (HitObjectContainer == null)
                 throw new InvalidOperationException($"{nameof(HitObjectContainer)} should be set before {nameof(CheckHittable)} is called.");
 
-            var aliveObjects = HitObjectContainer.AliveObjects.ToList();
-            int index = aliveObjects.IndexOf(hitObject);
+            DrawableHitObject? previous = null;
+            bool found = false;
+            bool hasBlockingEarlierObject = false;
 
-            if (index > 0)
+            foreach (DrawableHitObject testObject in HitObjectContainer.AliveObjects)
             {
-                var previousHitObject = (DrawableOsuHitObject)aliveObjects[index - 1];
+                if (testObject == hitObject)
+                {
+                    found = true;
+                    break;
+                }
+
+                previous = testObject;
+
+                // for all other objects, we check for validity and block the hit if any are still valid.
+                // 3ms of extra leniency to account for slightly unsnapped objects.
+                if (!hasBlockingEarlierObject && !testObject.AllJudged && testObject.HitObject.GetEndTime() + 3 < hitObject.HitObject.StartTime)
+                    hasBlockingEarlierObject = true;
+            }
+
+            if (found && previous != null)
+            {
+                var previousHitObject = (DrawableOsuHitObject)previous;
                 if (previousHitObject.HitObject.StackHeight > 0 && !previousHitObject.AllJudged)
                     return ClickAction.Ignore;
             }
@@ -51,20 +68,8 @@ namespace osu.Game.Rulesets.Osu.UI
             if (result == HitResult.None)
                 return ClickAction.Shake;
 
-            foreach (DrawableHitObject testObject in aliveObjects)
-            {
-                if (testObject.AllJudged)
-                    continue;
-
-                // if we found the object being checked, we can move on to the final timing test.
-                if (testObject == hitObject)
-                    break;
-
-                // for all other objects, we check for validity and block the hit if any are still valid.
-                // 3ms of extra leniency to account for slightly unsnapped objects.
-                if (testObject.HitObject.GetEndTime() + 3 < hitObject.HitObject.StartTime)
-                    return ClickAction.Shake;
-            }
+            if (hasBlockingEarlierObject)
+                return ClickAction.Shake;
 
             return Math.Abs(hitObject.HitObject.StartTime - time) < hittableRange ? ClickAction.Hit : ClickAction.Shake;
         }

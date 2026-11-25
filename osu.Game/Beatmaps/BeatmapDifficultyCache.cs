@@ -90,12 +90,14 @@ namespace osu.Game.Beatmaps
                     return;
 
                 modSettingChangeTracker?.Dispose();
+                invalidateEffectiveLookup();
 
                 Scheduler.AddOnce(updateTrackedBindables);
 
                 modSettingChangeTracker = new ModSettingChangeTracker(mods.NewValue);
                 modSettingChangeTracker.SettingChanged += _ =>
                 {
+                    invalidateEffectiveLookup();
                     lock (bindableUpdateLock)
                     {
                         debouncedModSettingsChange?.Cancel();
@@ -136,12 +138,47 @@ namespace osu.Game.Beatmaps
         /// <param name="cancellationToken">An optional <see cref="CancellationToken"/> which stops updating the star difficulty for the given <see cref="BeatmapInfo"/>.</param>
         /// <param name="computationDelay">A delay in milliseconds before performing the </param>
         /// <returns>A bindable that is updated to contain the star difficulty when it becomes available. May be an approximation while in an initial calculating state.</returns>
+        private EffectiveStarRatingLookup? cachedEffectiveLookup;
+        private IRulesetInfo? cachedEffectiveLookupRuleset;
+        private IReadOnlyList<Mod>? cachedEffectiveLookupMods;
+
+        private void invalidateEffectiveLookup()
+        {
+            lock (bindableUpdateLock)
+                cachedEffectiveLookup = null;
+        }
+
+        private EffectiveStarRatingLookup getCachedEffectiveLookup()
+        {
+            lock (bindableUpdateLock)
+            {
+                var ruleset = currentRuleset.Value;
+                var mods = currentMods.Value;
+
+                if (cachedEffectiveLookup != null
+                    && ReferenceEquals(cachedEffectiveLookupRuleset, ruleset)
+                    && ReferenceEquals(cachedEffectiveLookupMods, mods))
+                {
+                    return cachedEffectiveLookup;
+                }
+
+                cachedEffectiveLookup = CreateEffectiveStarRatingLookup(ruleset, mods);
+                cachedEffectiveLookupRuleset = ruleset;
+                cachedEffectiveLookupMods = mods;
+                return cachedEffectiveLookup;
+            }
+        }
+
         public IBindable<StarDifficulty> GetBindableDifficulty(IBeatmapInfo beatmapInfo, CancellationToken cancellationToken = default, int computationDelay = 0)
         {
+            double seed = beatmapInfo is BeatmapInfo local
+                ? getCachedEffectiveLookup().GetEffectiveStarRating(local)
+                : beatmapInfo.StarRating;
+
             var bindable = new BindableStarDifficulty(beatmapInfo, cancellationToken)
             {
                 // Start with the mod-adjusted star rating (cached exact value or approximation) instead of zero.
-                Value = new StarDifficulty(getEffectiveStarRating(beatmapInfo), 0)
+                Value = new StarDifficulty(seed, 0)
             };
 
             lock (bindableUpdateLock)
@@ -270,12 +307,19 @@ namespace osu.Game.Beatmaps
             {
                 cancelTrackedBindableUpdate();
 
+                var effectiveLookup = CreateEffectiveStarRatingLookup(currentRuleset.Value, currentMods.Value);
+                cachedEffectiveLookup = effectiveLookup;
+                cachedEffectiveLookupRuleset = currentRuleset.Value;
+                cachedEffectiveLookupMods = currentMods.Value;
+
                 foreach (var b in trackedBindables)
                 {
                     // Cancelled bindables belong to consumers that have moved on (e.g. pooled carousel panels now showing another beatmap).
                     if (!b.CancellationToken.IsCancellationRequested)
                     {
-                        double seed = getEffectiveStarRating(b.BeatmapInfo);
+                        double seed = b.BeatmapInfo is BeatmapInfo local
+                            ? effectiveLookup.GetEffectiveStarRating(local)
+                            : b.BeatmapInfo.StarRating;
 
                         // Only seed when the star rating actually changes, so non-difficulty mod changes (e.g. NF) don't drop the attributes.
                         if (seed != b.Value.Stars)

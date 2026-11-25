@@ -16,10 +16,25 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public event Func<bool>? Failed;
 
+        private Func<HealthProcessor, JudgementResult, bool>? failConditions;
+        private Func<HealthProcessor, JudgementResult, bool>[]? failConditionsCache;
+
         /// <summary>
         /// Additional conditions on top of <see cref="CheckDefaultFailCondition"/> that cause a failing state.
         /// </summary>
-        public event Func<HealthProcessor, JudgementResult, bool>? FailConditions;
+        public event Func<HealthProcessor, JudgementResult, bool>? FailConditions
+        {
+            add
+            {
+                failConditions += value;
+                failConditionsCache = null;
+            }
+            remove
+            {
+                failConditions -= value;
+                failConditionsCache = null;
+            }
+        }
 
         /// <summary>
         /// The current health.
@@ -89,12 +104,21 @@ namespace osu.Game.Rulesets.Scoring
             if (CheckDefaultFailCondition(result))
                 return true;
 
-            if (FailConditions != null)
+            if (failConditions != null)
             {
-                foreach (var condition in FailConditions.GetInvocationList())
+                var handlers = failConditionsCache;
+                if (handlers == null)
                 {
-                    bool conditionResult = (bool)condition.Method.Invoke(condition.Target, new object[] { this, result })!;
-                    if (conditionResult)
+                    Delegate[] list = failConditions.GetInvocationList();
+                    handlers = new Func<HealthProcessor, JudgementResult, bool>[list.Length];
+                    for (int i = 0; i < list.Length; i++)
+                        handlers[i] = (Func<HealthProcessor, JudgementResult, bool>)list[i];
+                    failConditionsCache = handlers;
+                }
+
+                for (int i = 0; i < handlers.Length; i++)
+                {
+                    if (handlers[i](this, result))
                         return true;
                 }
             }
