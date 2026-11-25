@@ -408,14 +408,18 @@ namespace osu.Game.Screens.Play.HUD.HitErrorMeters
             if (judgementsContainer.Count > max_concurrent_judgements)
             {
                 const double quick_fade_time = 100;
+                double cutoff = Clock.CurrentTime + quick_fade_time * 1.1;
 
                 // check with a bit of lenience to avoid precision error in comparison.
-                var old = judgementsContainer.FirstOrDefault(j => j.LifetimeEnd > Clock.CurrentTime + quick_fade_time * 1.1);
-
-                if (old != null)
+                for (int i = 0; i < judgementsContainer.Count; i++)
                 {
-                    old.ClearTransforms();
-                    old.FadeOut(quick_fade_time).Expire();
+                    var old = judgementsContainer[i];
+                    if (old.LifetimeEnd > cutoff)
+                    {
+                        old.ClearTransforms();
+                        old.FadeOut(quick_fade_time).Expire();
+                        break;
+                    }
                 }
             }
 

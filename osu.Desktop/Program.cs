@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using osu.Desktop.LegacyIpc;
 using osu.Desktop.Windows;
@@ -52,7 +53,7 @@ namespace osu.Desktop
             {
                 try
                 {
-                    foreach (string line in File.ReadAllLines(storageIni))
+                    foreach (string line in File.ReadLines(storageIni))
                     {
                         string trimmed = line.Trim();
                         if (trimmed.StartsWith("FullPath", StringComparison.OrdinalIgnoreCase))
@@ -102,7 +103,7 @@ namespace osu.Desktop
 
             try
             {
-                foreach (string rawLine in File.ReadAllLines(iniPath))
+                foreach (string rawLine in File.ReadLines(iniPath))
                 {
                     string line = rawLine.Trim();
                     if (line.Length == 0 || line.StartsWith('#') || line.StartsWith(';'))
@@ -130,13 +131,13 @@ namespace osu.Desktop
             return null;
         }
 
-        private static FileStream? beginVulkanSessionRecovery(string storageFolder)
+        private static FileStream? beginVulkanSessionRecovery(string storageFolder, ref string? configuredRenderer)
         {
             string frameworkIni = Path.Combine(storageFolder, "framework.ini");
             string markerPath = Path.Combine(storageFolder, ".torii-vulkan-session");
             FileStream? marker = null;
 
-            if (!isVulkanConfigured(frameworkIni))
+            if (!isVulkanRenderer(configuredRenderer))
             {
                 try
                 {
@@ -159,6 +160,7 @@ namespace osu.Desktop
                 if (marker.Length > 0)
                 {
                     resetRendererToAutomatic(frameworkIni);
+                    configuredRenderer = "Automatic";
                     finishVulkanSession(marker);
                     Logger.Log("[Torii] La sesion Vulkan anterior no cerro bien; renderer reseteado a Automatic.", LoggingTarget.Runtime, LogLevel.Important);
                     return null;
@@ -189,7 +191,7 @@ namespace osu.Desktop
 
             try
             {
-                foreach (string rawLine in File.ReadAllLines(frameworkIni))
+                foreach (string rawLine in File.ReadLines(frameworkIni))
                 {
                     string line = rawLine.Trim();
                     int eq = line.IndexOf('=');
@@ -207,9 +209,8 @@ namespace osu.Desktop
             return null;
         }
 
-        private static bool isVulkanConfigured(string frameworkIni)
+        private static bool isVulkanRenderer(string? value)
         {
-            string? value = readConfiguredRenderer(frameworkIni);
             if (string.IsNullOrEmpty(value))
                 return false;
 
@@ -343,7 +344,10 @@ namespace osu.Desktop
             // Lazer and stable share the same executable name.
             // Stable sets this setting to "Off", which may not be what we want, so let's force it back to the default "Auto" on startup.
             if (OperatingSystem.IsWindows())
+            {
+                disableWindowsPowerThrottling();
                 NVAPI.ThreadedOptimisations = NvThreadControlSetting.OGL_THREAD_CONTROL_DEFAULT;
+            }
 
             // This is a safe default. Localised usages should specify lower values as required.
             AppDomain.CurrentDomain.SetData("REGEX_DEFAULT_MATCH_TIMEOUT", TimeSpan.FromMilliseconds(1000));
@@ -414,14 +418,13 @@ namespace osu.Desktop
             }
 
             string storageFolder = resolveDefaultStorageFolder();
+            string frameworkIni = Path.Combine(storageFolder, "framework.ini");
+            string? configuredRenderer = readConfiguredRenderer(frameworkIni);
 
-            FileStream? vulkanSessionMarker = beginVulkanSessionRecovery(storageFolder);
+            FileStream? vulkanSessionMarker = beginVulkanSessionRecovery(storageFolder, ref configuredRenderer);
 
             if (OperatingSystem.IsWindows() || OperatingSystem.IsLinux())
             {
-                string frameworkIni = Path.Combine(storageFolder, "framework.ini");
-                string? configuredRenderer = readConfiguredRenderer(frameworkIni);
-
                 foreach (string arg in args)
                 {
                     if (arg.StartsWith("--renderer=", StringComparison.OrdinalIgnoreCase))
@@ -552,5 +555,47 @@ namespace osu.Desktop
             app.OnAfterUpdateFastCallback(_ => WindowsAssociationManager.UpdateAssociations());
             app.OnBeforeUninstallFastCallback(_ => WindowsAssociationManager.UninstallAssociations());
         }
+
+        [SupportedOSPlatform("windows")]
+        private static unsafe void disableWindowsPowerThrottling()
+        {
+            try
+            {
+                // Opt out of Windows 11 EcoQoS execution-speed throttling and timer-resolution throttling
+                // so laptops / hybrid CPUs keep high-precision timers and full clock speeds during gameplay.
+                const int process_power_throttling = 4;
+                const uint process_power_throttling_current_version = 1;
+                const uint process_power_throttling_execution_speed = 0x1;
+                const uint process_power_throttling_ignore_timer_resolution = 0x4;
+
+                var state = new ProcessPowerThrottlingState
+                {
+                    Version = process_power_throttling_current_version,
+                    ControlMask = process_power_throttling_execution_speed | process_power_throttling_ignore_timer_resolution,
+                    StateMask = 0,
+                };
+
+                setProcessInformation(getCurrentProcess(), process_power_throttling, &state, (uint)sizeof(ProcessPowerThrottlingState));
+            }
+            catch
+            {
+                // Best-effort: older Windows versions may not support ProcessPowerThrottling.
+            }
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct ProcessPowerThrottlingState
+        {
+            public uint Version;
+            public uint ControlMask;
+            public uint StateMask;
+        }
+
+        [DllImport("kernel32.dll", EntryPoint = "GetCurrentProcess")]
+        private static extern IntPtr getCurrentProcess();
+
+        [DllImport("kernel32.dll", EntryPoint = "SetProcessInformation", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern unsafe bool setProcessInformation(IntPtr processHandle, int processInformationClass, void* processInformation, uint processInformationSize);
     }
 }

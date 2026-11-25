@@ -260,14 +260,26 @@ namespace osu.Game.Rulesets.Osu.Skinning.Argon
 
             public bool HitLighting { get; set; }
 
+            private Color4 lastColour;
+            private bool lastHitLighting;
+            private bool edgeEffectInitialised;
+
             protected override void Update()
             {
                 base.Update();
 
+                Color4 currentColour = Colour;
+                if (edgeEffectInitialised && lastHitLighting == HitLighting && lastColour == currentColour)
+                    return;
+
+                lastHitLighting = HitLighting;
+                lastColour = currentColour;
+                edgeEffectInitialised = true;
+
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
-                    Colour = Colour,
+                    Colour = currentColour,
                     Radius = OsuHitObject.OBJECT_RADIUS * (HitLighting ? 1.2f : 0.6f),
                 };
             }

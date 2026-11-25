@@ -146,10 +146,25 @@ namespace osu.Game.Rulesets.Osu.UI
 
             if (osuBeatmap != null)
             {
-                foreach (var slider in osuBeatmap.HitObjects.OfType<Slider>())
+                var hitObjects = osuBeatmap.HitObjects;
+                for (int i = 0; i < hitObjects.Count; i++)
                 {
-                    maxRepeatsOnOneSlider = Math.Max(maxRepeatsOnOneSlider, slider.RepeatCount);
-                    maxTicksOnOneSlider = Math.Max(maxTicksOnOneSlider, slider.NestedHitObjects.OfType<SliderTick>().Count());
+                    if (hitObjects[i] is not Slider slider)
+                        continue;
+
+                    if (slider.RepeatCount > maxRepeatsOnOneSlider)
+                        maxRepeatsOnOneSlider = slider.RepeatCount;
+
+                    int ticks = 0;
+                    var nested = slider.NestedHitObjects;
+                    for (int j = 0; j < nested.Count; j++)
+                    {
+                        if (nested[j] is SliderTick)
+                            ticks++;
+                    }
+
+                    if (ticks > maxTicksOnOneSlider)
+                        maxTicksOnOneSlider = ticks;
                 }
             }
 

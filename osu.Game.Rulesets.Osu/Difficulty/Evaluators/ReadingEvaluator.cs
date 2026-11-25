@@ -143,16 +143,25 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
         private static double getPastObjectDifficultyInfluence(OsuDifficultyHitObject currObj)
         {
             double pastObjectDifficultyInfluence = 0;
+            double currStartTime = currObj.StartTime;
+            double minVisibleStartTime = currStartTime - currObj.Preempt;
 
-            foreach (var loopObj in retrievePastVisibleObjects(currObj))
+            for (int i = 0; i < currObj.Index; i++)
             {
+                OsuDifficultyHitObject loopObj = (OsuDifficultyHitObject)currObj.Previous(i);
+
+                if (loopObj.IsNull() ||
+                    currStartTime - loopObj.StartTime > reading_window_size ||
+                    loopObj.StartTime < minVisibleStartTime) // Current object not visible at the time object needs to be clicked
+                    break;
+
                 double loopDifficulty = currObj.OpacityAt(loopObj.BaseObject.StartTime, false);
 
                 // When aiming an object small distances mean previous objects may be cheesed, so it doesn't matter whether they were arranged confusingly.
                 loopDifficulty *= DifficultyCalculationUtils.Smootherstep(loopObj.LazyJumpDistance, 15, distance_influence_threshold);
 
                 // Account less for objects close to the max reading window
-                double timeBetweenCurrAndLoopObj = currObj.StartTime - loopObj.StartTime;
+                double timeBetweenCurrAndLoopObj = currStartTime - loopObj.StartTime;
                 double timeNerfFactor = getTimeNerfFactor(timeBetweenCurrAndLoopObj);
 
                 loopDifficulty *= timeNerfFactor;
@@ -160,22 +169,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             }
 
             return pastObjectDifficultyInfluence;
-        }
-
-        // Returns a list of objects that are visible on screen at the point in time the current object becomes visible.
-        private static IEnumerable<OsuDifficultyHitObject> retrievePastVisibleObjects(OsuDifficultyHitObject current)
-        {
-            for (int i = 0; i < current.Index; i++)
-            {
-                OsuDifficultyHitObject hitObject = (OsuDifficultyHitObject)current.Previous(i);
-
-                if (hitObject.IsNull() ||
-                    current.StartTime - hitObject.StartTime > reading_window_size ||
-                    hitObject.StartTime < current.StartTime - current.Preempt) // Current object not visible at the time object needs to be clicked
-                    break;
-
-                yield return hitObject;
-            }
         }
 
         // Returns the density of objects visible at the point in time the current object needs to be clicked capped by the reading window.

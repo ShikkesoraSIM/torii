@@ -50,6 +50,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
 
             double angleRepeatCount = 0.0;
 
+            bool hasHidden = false;
+            bool hasHiddenFadingObjects = false;
+            for (int m = 0; m < mods.Count; m++)
+            {
+                if (mods[m] is OsuModHidden hiddenMod)
+                {
+                    hasHidden = true;
+                    if (!hiddenMod.OnlyFadeApproachCircles.Value)
+                        hasHiddenFadingObjects = true;
+                }
+            }
+
             // This is iterating backwards in time from the current object.
             for (int i = 0; i < Math.Min(current.Index, 10); i++)
             {
@@ -70,7 +82,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
                     double stackNerf = Math.Min(1.0, (currentObj.LazyJumpDistance / scalingFactor) / 25.0);
 
                     // Bonus based on how visible the object is.
-                    double opacityBonus = 1.0 + max_opacity_bonus * (1.0 - osuCurrent.OpacityAt(currentHitObject.StartTime, mods.OfType<OsuModHidden>().Any(m => !m.OnlyFadeApproachCircles.Value)));
+                    double opacityBonus = 1.0 + max_opacity_bonus * (1.0 - osuCurrent.OpacityAt(currentHitObject.StartTime, hasHiddenFadingObjects));
 
                     flashlightDifficulty += stackNerf * opacityBonus * scalingFactor * jumpDistance / cumulativeStrainTime;
 
@@ -88,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Evaluators
             flashlightDifficulty = Math.Pow(smallDistNerf * flashlightDifficulty, 2.0);
 
             // Additional bonus for Hidden due to there being no approach circles.
-            if (mods.OfType<OsuModHidden>().Any())
+            if (hasHidden)
                 flashlightDifficulty *= 1.0 + hidden_bonus;
 
             // Nerf patterns with repeated angles.

@@ -79,45 +79,74 @@ namespace osu.Game.Beatmaps
 
         public double GetMostCommonBeatLength()
         {
+            var timingPoints = ControlPointInfo.TimingPoints;
+            if (timingPoints.Count == 0)
+                return TimingControlPoint.DEFAULT_BEAT_LENGTH;
+
             double lastTime;
 
             // The last playable time in the beatmap - the last timing point extends to this time.
             // Note: This is more accurate and may present different results because osu-stable didn't have the ability to calculate slider durations in this context.
-            if (!HitObjects.Any())
-                lastTime = ControlPointInfo.TimingPoints.LastOrDefault()?.Time ?? 0;
+            if (HitObjects.Count == 0)
+                lastTime = timingPoints[^1].Time;
             else
                 lastTime = this.GetLastObjectTime();
 
-            var mostCommon =
-                // Construct a set of (beatLength, duration) tuples for each individual timing point.
-                ControlPointInfo.TimingPoints.Select((t, i) =>
-                                {
-                                    if (t.Time > lastTime)
-                                        return (beatLength: t.BeatLength, 0);
+            var durations = new Dictionary<double, double>();
+            var order = new List<double>();
+            double minBeatLength = double.MaxValue;
+            double maxBeatLength = double.MinValue;
 
-                                    // osu-stable forced the first control point to start at 0.
-                                    // This is reproduced here to maintain compatibility around osu!mania scroll speed and song select display.
-                                    double currentTime = i == 0 ? 0 : t.Time;
-                                    double nextTime = i == ControlPointInfo.TimingPoints.Count - 1 ? lastTime : ControlPointInfo.TimingPoints[i + 1].Time;
+            for (int i = 0; i < timingPoints.Count; i++)
+            {
+                var t = timingPoints[i];
+                double rawBeatLength = t.BeatLength;
 
-                                    return (beatLength: t.BeatLength, duration: nextTime - currentTime);
-                                })
-                                // Aggregate durations into a set of (beatLength, duration) tuples for each beat length
-                                // Rounding is applied here (to 1e-3 milliseconds) to neutralise potential effects of floating point inaccuracies
-                                .GroupBy(t => Math.Round(t.beatLength * 1000) / 1000)
-                                .Select(g => (beatLength: g.Key, duration: g.Sum(t => t.duration)))
-                                // Get the most common one, or 0 as a suitable default (see handling below)
-                                .OrderByDescending(i => i.duration).FirstOrDefault();
+                if (rawBeatLength < minBeatLength) minBeatLength = rawBeatLength;
+                if (rawBeatLength > maxBeatLength) maxBeatLength = rawBeatLength;
 
-            if (mostCommon.beatLength == 0)
+                double duration = 0;
+                if (t.Time <= lastTime)
+                {
+                    // osu-stable forced the first control point to start at 0.
+                    // This is reproduced here to maintain compatibility around osu!mania scroll speed and song select display.
+                    double currentTime = i == 0 ? 0 : t.Time;
+                    double nextTime = i == timingPoints.Count - 1 ? lastTime : timingPoints[i + 1].Time;
+                    duration = nextTime - currentTime;
+                }
+
+                // Rounding is applied here (to 1e-3 milliseconds) to neutralise potential effects of floating point inaccuracies
+                double roundedKey = Math.Round(rawBeatLength * 1000) / 1000;
+                if (durations.TryGetValue(roundedKey, out double existing))
+                    durations[roundedKey] = existing + duration;
+                else
+                {
+                    durations[roundedKey] = duration;
+                    order.Add(roundedKey);
+                }
+            }
+
+            double bestBeatLength = 0;
+            double bestDuration = double.NegativeInfinity;
+
+            for (int i = 0; i < order.Count; i++)
+            {
+                double key = order[i];
+                double duration = durations[key];
+                if (duration > bestDuration)
+                {
+                    bestDuration = duration;
+                    bestBeatLength = key;
+                }
+            }
+
+            if (bestBeatLength == 0)
                 return TimingControlPoint.DEFAULT_BEAT_LENGTH;
 
-            // Because of the rounding applied to the beat length above, it is possible for the "most common" beat length as determined by the linq query above
-            // to actually be less or more than the raw range of unrounded beat lengths present in the map
-            // To ensure this does not become a problem anywhere else further, clamp the result to the known raw range
-            double minBeatLength = ControlPointInfo.TimingPoints.Min(t => t.BeatLength);
-            double maxBeatLength = ControlPointInfo.TimingPoints.Max(t => t.BeatLength);
-            return Math.Clamp(mostCommon.beatLength, minBeatLength, maxBeatLength);
+            // Because of the rounding applied to the beat length above, it is possible for the "most common" beat length as determined above
+            // to actually be less or more than the raw range of unrounded beat lengths present in the map.
+            // To ensure this does not become a problem anywhere else further, clamp the result to the known raw range.
+            return Math.Clamp(bestBeatLength, minBeatLength, maxBeatLength);
         }
 
         public double AudioLeadIn { get; set; }

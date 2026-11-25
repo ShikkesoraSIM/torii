@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Play.HUD
                                    IsValid = true;
 
                                    if (lastJudgement != null)
-                                       onJudgementChanged(lastJudgement);
+                                       recomputePerformancePoints();
                                }), TaskContinuationOptions.OnlyOnRanToCompletion);
             }
         }
@@ -78,21 +78,51 @@ namespace osu.Game.Screens.Play.HUD
 
             if (scoreProcessor != null)
             {
-                scoreProcessor.NewJudgement += onJudgementChanged;
-                scoreProcessor.JudgementReverted += onJudgementChanged;
+                scoreProcessor.NewJudgement += onNewJudgement;
+                scoreProcessor.JudgementReverted += onJudgementReverted;
             }
 
             if (gameplayState?.LastJudgementResult.Value != null)
-                onJudgementChanged(gameplayState.LastJudgementResult.Value);
+                onNewJudgement(gameplayState.LastJudgementResult.Value);
         }
 
         public virtual bool IsValid { get; set; }
 
-        private void onJudgementChanged(JudgementResult judgement)
+        private bool ppUpdateQueued;
+
+        private void onNewJudgement(JudgementResult judgement)
         {
             lastJudgement = judgement;
 
-            var attrib = getAttributeAtTime(judgement);
+            if (judgement.Type == HitResult.IgnoreHit || judgement.Type == HitResult.IgnoreMiss || judgement.Type.IsBonus())
+                return;
+
+            queuePerformancePointsRecompute();
+        }
+
+        private void onJudgementReverted(JudgementResult judgement)
+        {
+            lastJudgement = judgement;
+            queuePerformancePointsRecompute();
+        }
+
+        private void queuePerformancePointsRecompute()
+        {
+            if (ppUpdateQueued)
+                return;
+
+            ppUpdateQueued = true;
+            Schedule(recomputePerformancePoints);
+        }
+
+        private void recomputePerformancePoints()
+        {
+            ppUpdateQueued = false;
+
+            if (lastJudgement == null)
+                return;
+
+            var attrib = getAttributeAtTime(lastJudgement);
 
             if (gameplayState == null || attrib == null || scoreProcessor == null)
             {
@@ -124,8 +154,8 @@ namespace osu.Game.Screens.Play.HUD
 
             if (scoreProcessor != null)
             {
-                scoreProcessor.NewJudgement -= onJudgementChanged;
-                scoreProcessor.JudgementReverted -= onJudgementChanged;
+                scoreProcessor.NewJudgement -= onNewJudgement;
+                scoreProcessor.JudgementReverted -= onJudgementReverted;
             }
 
             loadCancellationSource?.Cancel();

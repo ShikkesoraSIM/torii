@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Concurrent;
 using System.IO;
+using System.Runtime.CompilerServices;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Rendering;
 using osu.Framework.Graphics.Sprites;
@@ -40,11 +42,21 @@ namespace osu.Game.Cosmetics.Definitions
         /// <param name="renderer">renderer para crear la textura.</param>
         /// <param name="base64">el PNG en base64 embebido en la definicion.</param>
         /// <param name="longestSidePx">a que tamaño (lado mayor) normalizar; los sliders de escala lo ajustan encima.</param>
+        private static readonly ConditionalWeakTable<IRenderer, ConcurrentDictionary<(string base64, int quantisedSide), Func<int, Drawable>?>> texture_cache = new();
+
         public static Func<int, Drawable>? Resolve(IRenderer renderer, string base64, float longestSidePx = DefaultLongestSidePx)
         {
             if (renderer == null || string.IsNullOrEmpty(base64) || base64.Length > MaxBase64Length)
                 return null;
 
+            var perRenderer = texture_cache.GetOrCreateValue(renderer);
+            int keySide = (int)MathF.Round(longestSidePx * 10f);
+
+            return perRenderer.GetOrAdd((base64, keySide), key => decode(renderer, key.base64, longestSidePx));
+        }
+
+        private static Func<int, Drawable>? decode(IRenderer renderer, string base64, float longestSidePx)
+        {
             try
             {
                 byte[] bytes = Convert.FromBase64String(base64);

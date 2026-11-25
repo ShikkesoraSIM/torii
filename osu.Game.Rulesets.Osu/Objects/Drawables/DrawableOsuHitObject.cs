@@ -155,7 +155,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// Calculates the position of the given <paramref name="drawable"/> relative to the playfield area.
         /// </summary>
         /// <param name="drawable">The drawable to calculate its relative position.</param>
-        protected float CalculateDrawableRelativePosition(Drawable drawable) => (drawable.ScreenSpaceDrawQuad.Centre.X - parentScreenSpaceRectangle.X) / parentScreenSpaceRectangle.Width;
+        protected float CalculateDrawableRelativePosition(Drawable drawable)
+        {
+            var rect = parentScreenSpaceRectangle;
+            return (drawable.ScreenSpaceDrawQuad.Centre.X - rect.X) / rect.Width;
+        }
 
         protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(HitObject, judgement);
 

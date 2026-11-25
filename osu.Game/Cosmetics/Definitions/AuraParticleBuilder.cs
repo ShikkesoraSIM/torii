@@ -92,11 +92,23 @@ namespace osu.Game.Cosmetics.Definitions
             return new Vector2(dx, dy);
         }
 
+        private static readonly Color4[] default_white_palette = new[] { Color4.White };
+        private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<string[], Color4[]> palette_cache = new();
+
         private static Color4[] resolvePalette(string[] hex)
         {
             if (hex == null || hex.Length == 0)
-                return new[] { Color4.White };
-            return hex.Select(h => CosmeticSettingsBinder.ParseColour(h)).ToArray();
+                return default_white_palette;
+
+            if (palette_cache.TryGetValue(hex, out Color4[]? cached))
+                return cached;
+
+            var result = new Color4[hex.Length];
+            for (int i = 0; i < hex.Length; i++)
+                result[i] = CosmeticSettingsBinder.ParseColour(hex[i]);
+
+            palette_cache.AddOrUpdate(hex, result);
+            return result;
         }
 
         private static Color4 pickColour(ParticleSpec spec, Color4[] palette, Random random)

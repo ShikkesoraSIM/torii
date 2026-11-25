@@ -125,8 +125,13 @@ namespace osu.Game.Screens.Play.HUD
         protected override void Update()
         {
             base.Update();
-            content.Height = bar.Height + bar_height + info.Height;
-            graphContainer.Height = bar.Height;
+
+            float newContentHeight = bar.Height + bar_height + info.Height;
+            if (content.Height != newContentHeight)
+                content.Height = newContentHeight;
+
+            if (graphContainer.Height != bar.Height)
+                graphContainer.Height = bar.Height;
         }
 
         protected override void UpdateProgress(double progress, bool isIntro)

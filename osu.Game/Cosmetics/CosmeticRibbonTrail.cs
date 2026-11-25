@@ -242,6 +242,7 @@ namespace osu.Game.Cosmetics
             lastPosition = null;
             liveHead = null;
             distanceCarry = 0;
+            rebuildDirty = true;
         }
 
         public void SetLengthScale(float scale)
@@ -303,11 +304,15 @@ namespace osu.Game.Cosmetics
             lastPosition = position;
         }
 
+        private bool rebuildDirty = true;
+        private Vector2 lastRebuiltHead;
+
         private void addPoint(Vector2 position)
         {
             points.Add(new RibbonPoint { Pos = position, Time = Time.Current });
             while (points.Count > max_points)
                 points.RemoveAt(0);
+            rebuildDirty = true;
         }
 
         protected override void Update()
@@ -326,9 +331,20 @@ namespace osu.Game.Cosmetics
             while (remove < points.Count && points[remove].Time < cutoff)
                 remove++;
             if (remove > 0)
+            {
                 points.RemoveRange(0, remove);
+                rebuildDirty = true;
+            }
+
+            bool headMoved = liveHead.HasValue && Vector2.DistanceSquared(liveHead.Value, lastRebuiltHead) > 0.25f;
+            bool animated = points.Count > 0 && (PulseAmount > 0 || ColourMode == RibbonColourMode.Rainbow);
+
+            if (!rebuildDirty && !headMoved && !animated)
+                return;
 
             rebuild();
+            rebuildDirty = false;
+            lastRebuiltHead = liveHead ?? default;
         }
 
         private void clearAllVertices()

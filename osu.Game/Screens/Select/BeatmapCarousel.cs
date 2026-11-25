@@ -566,8 +566,11 @@ namespace osu.Game.Screens.Select
                 CollapseAllGroups();
             }
 
-            foreach (var item in Scroll.Panels.OfType<PanelBeatmapSet>().Where(p => p.Item != null))
-                updateVisibleBeatmaps((GroupedBeatmapSet)item.Item!.Model, item);
+            foreach (var panel in Scroll.Panels)
+            {
+                if (panel is PanelBeatmapSet setPanel && setPanel.Item?.Model is GroupedBeatmapSet model)
+                    updateVisibleBeatmaps(model, setPanel);
+            }
         }
 
         private void selectRecommendedDifficultyForBeatmapSet(GroupedBeatmapSet set)
@@ -590,6 +593,7 @@ namespace osu.Game.Screens.Select
             if (items == null || items.Count == 0) return;
 
             BeatmapSetInfo? beatmapSetInfo = null;
+            List<GroupedBeatmap>? beatmaps = null;
 
             foreach (var item in items)
             {
@@ -600,20 +604,34 @@ namespace osu.Game.Screens.Select
                     if (beatmapSetInfo == null)
                     {
                         beatmapSetInfo = beatmapInfo.BeatmapSet!;
-                        continue;
+                        beatmaps = new List<GroupedBeatmap>();
+                    }
+                    else if (!beatmapSetInfo.Equals(beatmapInfo.BeatmapSet))
+                    {
+                        // Found a beatmap with a different beatmap set, abort.
+                        return;
                     }
 
-                    // Found a beatmap with a different beatmap set, abort.
-                    if (!beatmapSetInfo.Equals(beatmapInfo.BeatmapSet))
-                        return;
+                    beatmaps!.Add(groupedBeatmap);
                 }
             }
 
-            var beatmaps = items.Select(i => i.Model).OfType<GroupedBeatmap>();
+            if (beatmaps == null)
+                return;
 
             // do not request recommended selection if the user already had selected a difficulty within the single filtered beatmap set,
             // as it could change the difficulty that will be selected
-            var preexistingSelection = beatmaps.FirstOrDefault(b => b.Equals(CurrentSelection as GroupedBeatmap));
+            var currentSelection = CurrentSelection as GroupedBeatmap;
+            GroupedBeatmap? preexistingSelection = null;
+
+            for (int i = 0; i < beatmaps.Count; i++)
+            {
+                if (beatmaps[i].Equals(currentSelection))
+                {
+                    preexistingSelection = beatmaps[i];
+                    break;
+                }
+            }
 
             if (preexistingSelection != null)
             {
@@ -662,7 +680,7 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public void CollapseAllGroups()
         {
-            foreach (var group in grouping.GroupItems.Keys.ToArray())
+            foreach (var group in grouping.GroupItems.Keys)
                 setExpansionStateOfGroup(group, false);
 
             ExpandedGroup = null;
@@ -1291,7 +1309,16 @@ namespace osu.Game.Screens.Select
         {
             HashSet<BeatmapInfo> visibleBeatmaps = [];
             if (grouping.SetItems.TryGetValue(groupedBeatmapSet, out var visibleItems))
-                visibleBeatmaps = visibleItems.Where(i => i.Model is GroupedBeatmap).Select(i => ((GroupedBeatmap)i.Model).Beatmap).ToHashSet();
+            {
+                foreach (var item in visibleItems)
+                {
+                    if (item.Model is GroupedBeatmap grouped)
+                        visibleBeatmaps.Add(grouped.Beatmap);
+                }
+            }
+
+            if (setPanel.VisibleBeatmaps.Value != null && setPanel.VisibleBeatmaps.Value.SetEquals(visibleBeatmaps))
+                return;
 
             setPanel.VisibleBeatmaps.Value = visibleBeatmaps;
         }

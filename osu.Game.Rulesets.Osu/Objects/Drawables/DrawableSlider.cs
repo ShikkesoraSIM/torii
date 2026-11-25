@@ -147,6 +147,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // Ensure that the version will change after the upcoming BindTo().
             pathVersion.Value = int.MaxValue;
             PathVersion.BindTo(HitObject.Path.Version);
+
+            snakingEndpointsCached = false;
+            lastBallCentre = new Vector2(float.NaN);
         }
 
         public override void Shake() => shakeContainer.Shake();
@@ -158,6 +161,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             PathVersion.UnbindFrom(HitObject.Path.Version);
 
             slidingSample?.ClearSamples();
+            snakingEndpointsCached = false;
         }
 
         protected override void LoadSamples()
@@ -234,20 +238,36 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public readonly Bindable<bool> Tracking = new Bindable<bool>();
 
+        private Vector2 lastBallCentre = new Vector2(float.NaN);
+        private bool snakingEndpointsCached;
+        private double lastSnakedStart;
+        private double lastSnakedEnd;
+        private int lastSnakedPathVersion;
+        private Vector2 cachedSnakedStartPos;
+        private Vector2 cachedSnakedEndPos;
+
         protected override void Update()
         {
             base.Update();
 
-            Tracking.Value = SliderInputManager.Tracking;
+            bool tracking = SliderInputManager.Tracking;
+            if (Tracking.Value != tracking)
+                Tracking.Value = tracking;
 
             if (slidingSample != null)
             {
-                if (Tracking.Value && Time.Current >= HitObject.StartTime)
+                if (tracking && Time.Current >= HitObject.StartTime)
                 {
                     // keep the sliding sample playing at the current tracking position
                     if (!slidingSample.RequestedPlaying)
                         slidingSample.Play();
-                    slidingSample.Balance.Value = CalculateSamplePlaybackBalance(CalculateDrawableRelativePosition(Ball));
+
+                    Vector2 ballCentre = Ball.ScreenSpaceDrawQuad.Centre;
+                    if (ballCentre != lastBallCentre)
+                    {
+                        lastBallCentre = ballCentre;
+                        slidingSample.Balance.Value = CalculateSamplePlaybackBalance(CalculateDrawableRelativePosition(Ball));
+                    }
                 }
                 else if (slidingSample.IsPlaying || slidingSample.RequestedPlaying)
                     slidingSample.Stop();
@@ -267,11 +287,33 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Ball.UpdateProgress(completionProgress);
             SliderBody?.UpdateProgress(HeadCircle.IsHit ? completionProgress : 0);
 
-            foreach (DrawableSliderRepeat repeat in repeatContainer)
-                repeat.UpdateSnakingPosition(HitObject.Path.PositionAt(SliderBody?.SnakedStart ?? 0), HitObject.Path.PositionAt(SliderBody?.SnakedEnd ?? 0));
+            if (repeatContainer.Count > 0)
+            {
+                double snakedStart = SliderBody?.SnakedStart ?? 0;
+                double snakedEnd = SliderBody?.SnakedEnd ?? 0;
+                int currentPathVersion = HitObject.Path.Version.Value;
 
-            Size = SliderBody?.Size ?? Vector2.Zero;
-            OriginPosition = SliderBody?.PathOffset ?? Vector2.Zero;
+                if (!snakingEndpointsCached || snakedStart != lastSnakedStart || snakedEnd != lastSnakedEnd || currentPathVersion != lastSnakedPathVersion)
+                {
+                    cachedSnakedStartPos = HitObject.Path.PositionAt(snakedStart);
+                    cachedSnakedEndPos = HitObject.Path.PositionAt(snakedEnd);
+                    lastSnakedStart = snakedStart;
+                    lastSnakedEnd = snakedEnd;
+                    lastSnakedPathVersion = currentPathVersion;
+                    snakingEndpointsCached = true;
+                }
+
+                for (int i = 0; i < repeatContainer.Count; i++)
+                    repeatContainer[i].UpdateSnakingPosition(cachedSnakedStartPos, cachedSnakedEndPos);
+            }
+
+            Vector2 newSize = SliderBody?.Size ?? Vector2.Zero;
+            if (Size != newSize)
+                Size = newSize;
+
+            Vector2 newOriginPosition = SliderBody?.PathOffset ?? Vector2.Zero;
+            if (OriginPosition != newOriginPosition)
+                OriginPosition = newOriginPosition;
 
             if (!relativeAnchorPositionLayout.IsValid)
             {

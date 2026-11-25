@@ -77,6 +77,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         private readonly TrailPart[] parts = new TrailPart[max_sprites];
         private Anchor trailOrigin = Anchor.Centre;
         private int currentIndex;
+        private int tailIndex;
+        private int activeCount;
+        private bool hadActiveParts;
         private IShader shader;
         private double timeOffset;
         private float time;
@@ -134,13 +137,23 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         {
             base.Update();
 
-            Invalidate(Invalidation.DrawNode);
-
             const int fade_clock_reset_threshold = 1000000;
 
             time = (float)((Time.Current - timeOffset) / FadeDuration);
             if (time > fade_clock_reset_threshold)
                 resetTime();
+
+            while (activeCount > 0 && (parts[tailIndex].InvalidationID == -1 || time - parts[tailIndex].Time >= 1))
+            {
+                tailIndex = (tailIndex + 1) % max_sprites;
+                activeCount--;
+            }
+
+            if (activeCount > 0 || hadActiveParts)
+            {
+                Invalidate(Invalidation.DrawNode);
+                hadActiveParts = activeCount > 0;
+            }
         }
 
         private void resetTime()
@@ -223,6 +236,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             ++parts[currentIndex].InvalidationID;
 
             currentIndex = (currentIndex + 1) % max_sprites;
+
+            if (activeCount == max_sprites)
+                tailIndex = currentIndex;
+            else
+                activeCount++;
         }
 
         protected override DrawNode CreateDrawNode() => new TrailDrawNode(this);
@@ -248,6 +266,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             private Vector2 cursorScale;
 
             private readonly TrailPart[] parts = new TrailPart[max_sprites];
+            private int activeCount;
             private Vector2 originPosition;
 
             private IVertexBatch<TexturedTrailVertex> vertexBatch;
@@ -280,7 +299,19 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 else if (Source.TrailOrigin.HasFlag(Anchor.y2))
                     originPosition.Y = 1f;
 
-                Source.parts.CopyTo(parts, 0);
+                int count = Source.activeCount;
+                activeCount = count;
+
+                if (count > 0)
+                {
+                    int start = Source.tailIndex;
+                    int firstChunk = Math.Min(count, max_sprites - start);
+                    Array.Copy(Source.parts, start, parts, 0, firstChunk);
+
+                    int remaining = count - firstChunk;
+                    if (remaining > 0)
+                        Array.Copy(Source.parts, 0, parts, firstChunk, remaining);
+                }
             }
 
             private IUniformBuffer<CursorTrailParameters> cursorTrailParameters;
@@ -288,6 +319,9 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             protected override void Draw(IRenderer renderer)
             {
                 base.Draw(renderer);
+
+                if (activeCount == 0)
+                    return;
 
                 vertexBatch ??= renderer.CreateQuadBatch<TexturedTrailVertex>(max_sprites, 1);
 
@@ -307,66 +341,81 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                 renderer.PushLocalMatrix(DrawInfo.Matrix);
 
-                float sin = MathF.Sin(angle);
-                float cos = MathF.Cos(angle);
+                bool hasRotation = angle != 0;
+                float sin = hasRotation ? MathF.Sin(angle) : 0;
+                float cos = hasRotation ? MathF.Cos(angle) : 1;
 
-                foreach (var part in parts)
+                float baseWidth = texture.DisplayWidth * cursorScale.X;
+                float baseHeight = texture.DisplayHeight * cursorScale.Y;
+                float leftFactor = baseWidth * originPosition.X;
+                float rightFactor = baseWidth * (1 - originPosition.X);
+                float topFactor = baseHeight * originPosition.Y;
+                float bottomFactor = baseHeight * (1 - originPosition.Y);
+
+                Color4 bottomLeftColour = DrawColourInfo.Colour.BottomLeft.Linear;
+                Color4 bottomRightColour = DrawColourInfo.Colour.BottomRight.Linear;
+                Color4 topRightColour = DrawColourInfo.Colour.TopRight.Linear;
+                Color4 topLeftColour = DrawColourInfo.Colour.TopLeft.Linear;
+                Vector4 fullTextureRect = new Vector4(0, 0, 1, 1);
+
+                for (int i = 0; i < activeCount; i++)
                 {
-                    if (part.InvalidationID == -1)
+                    ref readonly TrailPart part = ref parts[i];
+
+                    if (part.InvalidationID == -1 || time - part.Time >= 1)
                         continue;
 
-                    if (time - part.Time >= 1)
-                        continue;
+                    float left = part.Position.X - leftFactor * part.Scale.X;
+                    float right = part.Position.X + rightFactor * part.Scale.X;
+                    float top = part.Position.Y - topFactor * part.Scale.Y;
+                    float bottom = part.Position.Y + bottomFactor * part.Scale.Y;
+
+                    Vector2 bl = new Vector2(left, bottom);
+                    Vector2 br = new Vector2(right, bottom);
+                    Vector2 tr = new Vector2(right, top);
+                    Vector2 tl = new Vector2(left, top);
+
+                    if (hasRotation)
+                    {
+                        bl = rotateAround(bl, part.Position, sin, cos);
+                        br = rotateAround(br, part.Position, sin, cos);
+                        tr = rotateAround(tr, part.Position, sin, cos);
+                        tl = rotateAround(tl, part.Position, sin, cos);
+                    }
 
                     vertexBatch.Add(new TexturedTrailVertex
                     {
-                        Position = rotateAround(
-                            new Vector2(
-                                part.Position.X - texture.DisplayWidth * originPosition.X * part.Scale.X * cursorScale.X,
-                                part.Position.Y + texture.DisplayHeight * (1 - originPosition.Y) * part.Scale.Y * cursorScale.Y),
-                            part.Position, sin, cos),
+                        Position = bl,
                         TexturePosition = textureRect.BottomLeft,
-                        TextureRect = new Vector4(0, 0, 1, 1),
-                        Colour = DrawColourInfo.Colour.BottomLeft.Linear,
+                        TextureRect = fullTextureRect,
+                        Colour = bottomLeftColour,
                         Time = part.Time
                     });
 
                     vertexBatch.Add(new TexturedTrailVertex
                     {
-                        Position = rotateAround(
-                            new Vector2(
-                                part.Position.X + texture.DisplayWidth * (1 - originPosition.X) * part.Scale.X * cursorScale.X,
-                                part.Position.Y + texture.DisplayHeight * (1 - originPosition.Y) * part.Scale.Y * cursorScale.Y),
-                            part.Position, sin, cos),
+                        Position = br,
                         TexturePosition = textureRect.BottomRight,
-                        TextureRect = new Vector4(0, 0, 1, 1),
-                        Colour = DrawColourInfo.Colour.BottomRight.Linear,
+                        TextureRect = fullTextureRect,
+                        Colour = bottomRightColour,
                         Time = part.Time
                     });
 
                     vertexBatch.Add(new TexturedTrailVertex
                     {
-                        Position = rotateAround(
-                            new Vector2(
-                                part.Position.X + texture.DisplayWidth * (1 - originPosition.X) * part.Scale.X * cursorScale.X,
-                                part.Position.Y - texture.DisplayHeight * originPosition.Y * part.Scale.Y * cursorScale.Y),
-                            part.Position, sin, cos),
+                        Position = tr,
                         TexturePosition = textureRect.TopRight,
-                        TextureRect = new Vector4(0, 0, 1, 1),
-                        Colour = DrawColourInfo.Colour.TopRight.Linear,
+                        TextureRect = fullTextureRect,
+                        Colour = topRightColour,
                         Time = part.Time
                     });
 
                     vertexBatch.Add(new TexturedTrailVertex
                     {
-                        Position = rotateAround(
-                            new Vector2(
-                                part.Position.X - texture.DisplayWidth * originPosition.X * part.Scale.X * cursorScale.X,
-                                part.Position.Y - texture.DisplayHeight * originPosition.Y * part.Scale.Y * cursorScale.Y),
-                            part.Position, sin, cos),
+                        Position = tl,
                         TexturePosition = textureRect.TopLeft,
-                        TextureRect = new Vector4(0, 0, 1, 1),
-                        Colour = DrawColourInfo.Colour.TopLeft.Linear,
+                        TextureRect = fullTextureRect,
+                        Colour = topLeftColour,
                         Time = part.Time
                     });
                 }

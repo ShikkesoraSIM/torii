@@ -206,7 +206,10 @@ namespace osu.Game.Overlays.Mods
         protected override void Update()
         {
             base.Update();
-            scrollContainer.Height = Math.Min(scrollContainer.AvailableContent, DrawHeight - header_height);
+
+            float targetHeight = Math.Min(scrollContainer.AvailableContent, DrawHeight - header_height);
+            if (scrollContainer.Height != targetHeight)
+                scrollContainer.Height = targetHeight;
         }
 
         private partial class FocusGrabbingContainer : InputBlockingContainer

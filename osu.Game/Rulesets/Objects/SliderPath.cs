@@ -183,11 +183,9 @@ namespace osu.Game.Rulesets.Objects
 
             path.Clear();
 
-            int i = 0;
-
-            for (; i < calculatedPath.Count && cumulativeLength[i] < d0; ++i)
-            {
-            }
+            int i = indexOfDistance(d0);
+            while (i > 0 && cumulativeLength[i - 1] >= d0)
+                --i;
 
             path.Add(interpolateVertices(i, d0));
 
@@ -264,7 +262,8 @@ namespace osu.Game.Rulesets.Objects
         {
             ensureValid();
 
-            return segmentEndDistances.Select(d => d / Distance);
+            double distance = Distance;
+            return segmentEndDistances.Select(d => d / distance);
         }
 
         private void invalidate()

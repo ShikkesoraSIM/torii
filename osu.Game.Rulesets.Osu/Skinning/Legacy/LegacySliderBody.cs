@@ -24,23 +24,33 @@ namespace osu.Game.Rulesets.Osu.Skinning.Legacy
 
         private partial class LegacyDrawableSliderPath : DrawableSliderPath
         {
+            private bool coloursInitialised;
+            private Color4 lastAccentColour;
+            private Color4 cachedOuterColour;
+            private Color4 cachedInnerColour;
+
             protected override Color4 ColourAt(float position)
             {
-                Color4 shadow = new Color4(0, 0, 0, 0.25f);
-                Color4 outerColour = AccentColour.Darken(0.1f);
-                Color4 innerColour = lighten(AccentColour, 0.5f);
+                Color4 accent = AccentColour;
+                if (!coloursInitialised || accent != lastAccentColour)
+                {
+                    lastAccentColour = accent;
+                    cachedOuterColour = accent.Darken(0.1f);
+                    cachedInnerColour = lighten(accent, 0.5f);
+                    coloursInitialised = true;
+                }
 
                 // https://github.com/peppy/osu-stable-reference/blob/3ea48705eb67172c430371dcfc8a16a002ed0d3d/osu!/Graphics/Renderers/MmSliderRendererGL.cs#L59-L70
                 const float shadow_portion = 1 - (OsuLegacySkinTransformer.LEGACY_CIRCLE_RADIUS / OsuHitObject.OBJECT_RADIUS);
                 const float border_portion = 0.1875f;
 
                 if (position <= shadow_portion)
-                    return LegacyUtils.InterpolateNonLinear(position, Color4.Black.Opacity(0f), shadow, 0, shadow_portion);
+                    return LegacyUtils.InterpolateNonLinear(position, Color4.Black.Opacity(0f), new Color4(0, 0, 0, 0.25f), 0, shadow_portion);
 
                 if (position <= border_portion)
                     return BorderColour;
 
-                return LegacyUtils.InterpolateNonLinear(position, outerColour, innerColour, border_portion, 1);
+                return LegacyUtils.InterpolateNonLinear(position, cachedOuterColour, cachedInnerColour, border_portion, 1);
             }
 
             /// <summary>
