@@ -1325,6 +1325,16 @@ namespace osu.Game
             return base.OnKeyDown(e);
         }
 
+#if DEBUG
+        internal void PreviewPoints(bool compact)
+        {
+            if (compact)
+                toriiPointsWatcher?.CompactPreview();
+            else
+                toriiPointsWatcher?.ShowPreview();
+        }
+#endif
+
         protected override void LoadComplete()
         {
 
@@ -2430,6 +2440,8 @@ namespace osu.Game
 
         protected virtual void ScreenChanged([CanBeNull] IOsuScreen current, [CanBeNull] IOsuScreen newScreen)
         {
+            toriiPointsWatcher?.SetGameplay(newScreen is PlayerLoader or Player);
+
             SentrySdk.ConfigureScope(scope =>
             {
                 scope.Contexts[@"screen stack"] = new
