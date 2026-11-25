@@ -110,6 +110,9 @@ namespace osu.Game.Screens.Menu
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
+        [Resolved]
+        private OsuGameBase game { get; set; }
+
         [BackgroundDependencyLoader]
         private void load(RealmAccess realm, IAPIProvider api)
         {
@@ -322,9 +325,11 @@ namespace osu.Game.Screens.Menu
 
             if (!UsingThemedIntro)
             {
+                bool useSpecificOffset = false;
+
                 if (initialBeatmap != null)
                 {
-                    bool useSpecificOffset = ThemeMusic.UseSpecificOffset(initialBeatmap, config);
+                    useSpecificOffset = ThemeMusic.UseSpecificOffset(initialBeatmap, config);
 
                     initialBeatmap.PrepareTrackForPreview(false, useSpecificOffset ? ThemeMusic.PREVIEW_OFFSET : -2600);
 

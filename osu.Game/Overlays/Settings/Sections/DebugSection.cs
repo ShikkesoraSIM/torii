@@ -27,7 +27,6 @@ namespace osu.Game.Overlays.Settings.Sections
                 Add(new BatchImportSettings());
             }
 
-            Add(new GraphicsSettings());
             Add(new MemorySettings());
         }
     }

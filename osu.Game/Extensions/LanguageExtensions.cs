@@ -85,7 +85,6 @@ namespace osu.Game.Extensions
             Language.de => CountryCode.DE,
             Language.el => CountryCode.GR,
             Language.es => CountryCode.ES,
-            Language.es_419 => CountryCode.MX,
             Language.fi => CountryCode.FI,
             Language.fil => CountryCode.PH,
             Language.fr => CountryCode.FR,

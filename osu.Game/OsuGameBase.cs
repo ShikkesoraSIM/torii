@@ -35,7 +35,6 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Timing;
 using osu.Game.Audio;
-using OsuLoadErrorPlaceholder = osu.Game.Graphics.Containers.LoadErrorPlaceholder;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
@@ -271,10 +270,6 @@ namespace osu.Game
             Name = GAME_NAME;
 
             allowableExceptions = UnhandledExceptionsBeforeCrash;
-
-            // A component which throws while loading is replaced by an inline placeholder rather than taking the whole game down with it.
-            // The failure is still logged and reported as usual.
-            LoadErrorHandling.PlaceholderFactory = (failedDrawable, exception) => new OsuLoadErrorPlaceholder(failedDrawable, exception);
         }
 
         [BackgroundDependencyLoader]

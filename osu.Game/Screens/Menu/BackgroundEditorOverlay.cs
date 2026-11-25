@@ -38,8 +38,9 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Skinning;
 using osu.Game.Screens.Backgrounds;
-using Image = osu.Framework.Imaging.Image;
-using Rgba32 = osu.Framework.Imaging.Rgba32;
+using Image = SixLabors.ImageSharp.Image;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using osuTK;
 
 namespace osu.Game.Screens.Menu

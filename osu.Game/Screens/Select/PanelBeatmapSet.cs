@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Select
                     {
                         titleText = new OsuSpriteText
                         {
-                            Font = OsuFont.Style.Heading1.With(typeface: Typeface.MapleMono),
+                            Font = OsuFont.Style.Heading1,
                         },
                         artistText = new OsuSpriteText
                         {
