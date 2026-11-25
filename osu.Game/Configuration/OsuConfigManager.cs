@@ -191,6 +191,10 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.MenuMusic, true);
             SetDefault(OsuSetting.MenuTips, true);
 
+            SetDefault(OsuSetting.UseCustomThemeMusic, false);
+            SetDefault(OsuSetting.ThemeMusicStartFromPreview, false);
+            SetDefault(OsuSetting.ThemeMusicBeatmapSetId, string.Empty);
+
             SetDefault(OsuSetting.AudioOffset, 0, -500.0, 500.0, 1);
 
             SetDefault(OsuSetting.AutomaticallyAdjustBeatmapOffset, false);
@@ -779,5 +783,13 @@ namespace osu.Game.Configuration
         ToriiDifficultyRecalcMode,
         ToriiAppliedDifficultyVersions,
         ToriiSeenRealmDifficultyVersions,
+
+        UseCustomThemeMusic,
+        ThemeMusicStartFromPreview,
+
+        /// <summary>
+        /// The <see cref="osu.Game.Beatmaps.BeatmapSetInfo.ID"/> of the beatmap set used as custom theme music, stored as a string.
+        /// </summary>
+        ThemeMusicBeatmapSetId,
     }
 }

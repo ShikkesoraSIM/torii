@@ -28,6 +28,7 @@ using osu.Framework.Input.StateChanges;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Collections;
 using osu.Game.Configuration;
@@ -169,6 +170,9 @@ namespace osu.Game.Screens.Select
         private Sample? errorSample;
 
         [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
+        [Resolved]
         private OsuGameBase? game { get; set; }
 
         // torii: lo usamos para reconstruir el chrome legacy cuando cambia el skin estando en stable.
@@ -223,7 +227,7 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuConfigManager config)
+        private void load(AudioManager audio)
         {
             // BindFullScheme drives BOTH the chrome hue and the donator
             // accent hue on the song-select OverlayColourProvider in a
@@ -1622,6 +1626,9 @@ namespace osu.Game.Screens.Select
 
             foreach (var i in CreateCollectionMenuActions(beatmap))
                 yield return i;
+
+            if (beatmap.BeatmapSet != null)
+                yield return new OsuMenuItem(ThemeMusicStrings.UseAsThemeMusic, MenuItemType.Standard, () => UseAsThemeMusic(beatmap.BeatmapSet)) { Icon = FontAwesome.Solid.Music };
         }
 
         protected IEnumerable<OsuMenuItem> CreateCollectionMenuActions(BeatmapInfo beatmap)
@@ -1639,6 +1646,8 @@ namespace osu.Game.Screens.Select
         public void ManageCollections() => collectionsDialog?.Show();
 
         public void Delete(BeatmapSetInfo beatmapSet) => dialogOverlay?.Push(new BeatmapDeleteDialog(beatmapSet));
+
+        public void UseAsThemeMusic(BeatmapSetInfo beatmapSet) => ThemeMusic.SetBeatmapSet(config, beatmapSet);
 
         public void RestoreAllHidden(BeatmapSetInfo beatmapSet) => beatmaps.Restore(beatmapSet);
 
