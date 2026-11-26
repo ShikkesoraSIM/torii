@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using ManagedBass;
 using Moq;
 using NUnit.Framework;
 using osu.Framework.Audio.Track;
@@ -34,10 +33,6 @@ namespace osu.Game.Tests.Editing.Checks
                     Metadata = new BeatmapMetadata()
                 }
             };
-
-            // 0 = No output device. This still allows decoding.
-            if (!Bass.Init(0) && Bass.LastError != Errors.Already)
-                throw new AudioException("Could not initialize Bass.");
         }
 
         [Test]

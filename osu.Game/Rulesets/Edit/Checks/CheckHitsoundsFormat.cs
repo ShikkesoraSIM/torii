@@ -3,8 +3,7 @@
 
 using System.Collections.Generic;
 using System.IO;
-using ManagedBass;
-using osu.Framework.Audio.Callbacks;
+using osu.Framework.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Extensions;
 using osu.Game.Models;
@@ -50,23 +49,16 @@ namespace osu.Game.Rulesets.Edit.Checks
                     if (!AudioCheckUtils.HasAudioExtension(file.Filename) || !probablyHasAudioData(data))
                         continue;
 
-                    var fileCallbacks = new FileCallbacks(new DataStreamFileProcedures(data));
-                    int decodeStream = Bass.CreateStream(StreamSystem.NoBuffer, BassFlags.Decode, fileCallbacks.Callbacks, fileCallbacks.Handle);
+                    var format = AudioInspector.GetFormat(data);
 
-                    // If the format is not supported by BASS
-                    if (decodeStream == 0)
+                    if (format == AudioFormat.Unknown)
                     {
                         yield return new IssueTemplateFormatUnsupported(this).Create(file.Filename);
-
                         continue;
                     }
 
-                    var audioInfo = Bass.ChannelGetInfo(decodeStream);
-
-                    if ((audioInfo.ChannelType & ChannelType.Wave) == 0 && audioInfo.ChannelType != ChannelType.OGG)
+                    if (format != AudioFormat.Wave && format != AudioFormat.Ogg)
                         yield return new IssueTemplateIncorrectFormat(this).Create(file.Filename);
-
-                    Bass.StreamFree(decodeStream);
                 }
             }
         }

@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using ManagedBass;
+using osu.Framework.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
@@ -19,10 +19,10 @@ namespace osu.Game.Rulesets.Edit.Checks
             new IssueTemplateIncorrectFormat(this),
         };
 
-        private IEnumerable<ChannelType> allowedFormats => new[]
+        private IEnumerable<AudioFormat> allowedFormats => new[]
         {
-            ChannelType.MP3,
-            ChannelType.OGG,
+            AudioFormat.Mp3,
+            AudioFormat.Ogg,
         };
 
         public IEnumerable<Issue> Run(BeatmapVerifierContext context)
@@ -35,8 +35,8 @@ namespace osu.Game.Rulesets.Edit.Checks
 
             var audioFormat = AudioCheckUtils.GetAudioFormatFromFile(context, context.CurrentDifficulty.Playable.Metadata.AudioFile);
 
-            // If the format is not supported by BASS
-            if (audioFormat == 0)
+            // If the format is not supported
+            if (audioFormat == AudioFormat.Unknown)
             {
                 yield return new IssueTemplateFormatUnsupported(this).Create(audioFile.Filename);
 

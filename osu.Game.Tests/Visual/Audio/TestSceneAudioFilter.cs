@@ -3,7 +3,7 @@
 
 #nullable disable
 
-using ManagedBass.Fx;
+using osu.Framework.Audio.Mixing;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;

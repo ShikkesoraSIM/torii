@@ -4,7 +4,6 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using ManagedBass;
 using Moq;
 using NUnit.Framework;
 using NUnit.Framework.Legacy;
@@ -38,10 +37,6 @@ namespace osu.Game.Tests.Editing.Checks
                     }
                 }
             };
-
-            // 0 = No output device. This still allows decoding.
-            if (!Bass.Init(0) && Bass.LastError != Errors.Already)
-                throw new AudioException("Could not initialize Bass.");
         }
 
         [Test]

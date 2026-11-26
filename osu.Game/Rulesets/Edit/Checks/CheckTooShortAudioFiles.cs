@@ -3,8 +3,7 @@
 
 using System.Collections.Generic;
 using System.IO;
-using ManagedBass;
-using osu.Framework.Audio.Callbacks;
+using osu.Framework.Audio;
 using osu.Game.Extensions;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
@@ -34,13 +33,10 @@ namespace osu.Game.Rulesets.Edit.Checks
                         if (data == null)
                             continue;
 
-                        var fileCallbacks = new FileCallbacks(new DataStreamFileProcedures(data));
-                        int decodeStream = Bass.CreateStream(StreamSystem.NoBuffer, BassFlags.Decode | BassFlags.Prescan, fileCallbacks.Callbacks, fileCallbacks.Handle);
+                        if (!AudioInspector.TryInspect(data, out AudioStreamInfo info, prescanDuration: true))
+                            continue;
 
-                        if (decodeStream == 0) continue;
-
-                        long length = Bass.ChannelGetLength(decodeStream);
-                        double ms = Bass.ChannelBytes2Seconds(decodeStream, length) * 1000;
+                        double ms = info.DurationMs;
 
                         // Extremely short audio files do not play on some soundcards, resulting in nothing being heard in-game for some users.
                         if (ms > 0 && ms < ms_threshold)

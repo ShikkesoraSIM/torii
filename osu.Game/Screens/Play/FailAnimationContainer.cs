@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using ManagedBass.Fx;
+using osu.Framework.Audio.Mixing;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;

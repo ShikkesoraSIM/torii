@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using ManagedBass;
+using osu.Framework.Audio;
 using osu.Game.Rulesets.Edit.Checks.Components;
 
 namespace osu.Game.Rulesets.Edit.Checks
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Edit.Checks
             {
                 // Determine max bitrate based on audio format
                 var audioFormat = AudioCheckUtils.GetAudioFormatFromFile(context, audioFile);
-                int upperBitrateLimit = audioFormat.HasFlag(ChannelType.OGG) ? max_bitrate_ogg : max_bitrate_default;
+                int upperBitrateLimit = audioFormat == AudioFormat.Ogg ? max_bitrate_ogg : max_bitrate_default;
 
                 if (track.Bitrate.Value > upperBitrateLimit)
                     yield return new IssueTemplateTooHighBitrate(this).Create(track.Bitrate.Value, upperBitrateLimit);
