@@ -54,6 +54,8 @@ namespace osu.Game.Beatmaps
         private AudioManager audioManager { get; set; } = null!;
 
         private Bindable<bool> experimentalAudio = null!;
+        private Bindable<bool> exclusiveAudio = null!;
+        private IBindable<double> outputLatency = null!;
 
         /// <summary>
         /// Store seek target for any <see cref="Seek"/> performed before <see cref="LoadState.Loaded"/>.
@@ -109,7 +111,13 @@ namespace osu.Game.Beatmaps
                 userAudioOffset.BindValueChanged(offset => userGlobalOffsetClock.Offset = offset.NewValue, true);
 
                 experimentalAudio = audioManager.UseExperimentalWasapi.GetBoundCopy();
-                experimentalAudio.BindValueChanged(_ => updatePlatformOffset(), true);
+                experimentalAudio.BindValueChanged(_ => updatePlatformOffset());
+
+                exclusiveAudio = audioManager.UseExclusiveWasapi.GetBoundCopy();
+                exclusiveAudio.BindValueChanged(_ => updatePlatformOffset());
+
+                outputLatency = audioManager.OutputLatency.GetBoundCopy();
+                outputLatency.BindValueChanged(_ => updatePlatformOffset(), true);
 
                 // TODO: this doesn't update when using ChangeSource() to change beatmap.
                 beatmapOffsetSubscription = realm.SubscribeToPropertyChanged(
@@ -146,17 +154,25 @@ namespace osu.Game.Beatmaps
 
             Debug.Assert(platformOffsetClock != null);
 
+            // torii_audio reports the exact hardware ring-buffer latency via AudioManager.OutputLatency.
+            // In a double-buffered Shared stream, average write-to-speaker delay above the 3ms Exclusive
+            // baseline is ~55% of (OutputLatency - 3ms). Compensating this internally keeps Exclusive,
+            // Shared, Legacy, and non-Windows platforms aligned to the same zero point without touching
+            // the user's visible offset slider.
+            double hwLatencyMs = audioManager.OutputLatency.Value;
+            double extraBufferDelayMs = hwLatencyMs > 3.0 ? Math.Clamp((hwLatencyMs - 3.0) * 0.55, 0.0, 40.0) : 0.0;
+
             switch (RuntimeInfo.OS)
             {
                 case RuntimeInfo.Platform.Windows:
-                    platformOffsetClock.Offset = WINDOWS_BASE_AUDIO_OFFSET;
-
-                    if (audioManager.UseExperimentalWasapi.Value)
-                        platformOffsetClock.Offset += WINDOWS_EXPERIMENTAL_AUDIO_OFFSET;
+                    // Baseline calibrated to match osu! WASAPI Exclusive (~-10ms internal offset),
+                    // then automatically shifted by any extra Shared/Legacy ring-buffer latency.
+                    const double windows_exclusive_baseline = WINDOWS_BASE_AUDIO_OFFSET + WINDOWS_EXPERIMENTAL_AUDIO_OFFSET; // -10ms
+                    platformOffsetClock.Offset = windows_exclusive_baseline - extraBufferDelayMs;
                     return;
 
                 default:
-                    platformOffsetClock.Offset = 0;
+                    platformOffsetClock.Offset = -extraBufferDelayMs;
                     break;
             }
         }
