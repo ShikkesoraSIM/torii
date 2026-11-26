@@ -11,7 +11,7 @@ namespace osu.Game.Localisation
 
         public static LocalisableString WelcomeTitle => new TranslatableString(getKey(@"welcome_title"), @"Welcome to Torii!");
 
-        public static LocalisableString WelcomeDescription => new TranslatableString(getKey(@"welcome_description"), @"The parts that aren't in stock osu!");
+        public static LocalisableString WelcomeDescription => new TranslatableString(getKey(@"welcome_description"), @"The parts that aren't in the stock client");
 
         public static LocalisableString ClickToResumeWelcome => new TranslatableString(getKey(@"click_to_resume_welcome"), @"Click to resume the Torii welcome guide at any point");
 
@@ -19,9 +19,9 @@ namespace osu.Game.Localisation
 
         public static LocalisableString IntroTitle => new TranslatableString(getKey(@"intro_title"), @"Torii");
 
-        public static LocalisableString IntroDescription => new TranslatableString(getKey(@"intro_description"), @"Torii is a private osu! server with its own client: the same game you know, running against our servers, with a pile of extras built on top.
+        public static LocalisableString IntroDescription => new TranslatableString(getKey(@"intro_description"), @"Torii is an independent rhythm game client and server compatible with osu! beatmaps: the same gameplay you know, running against our servers, with a pile of extras built on top.
 
-Everything you play here counts here. Your scores, your pp and your leaderboard spot are yours and live on Torii, completely separate from the official server, so you can chase ranks without touching your osu! account.");
+Everything you play here counts here. Your scores, your pp and your leaderboard spot are yours and live on Torii, completely separate from any other server, so you can chase ranks without touching your account elsewhere.");
 
         public static LocalisableString IntroPointsTitle => new TranslatableString(getKey(@"intro_points_title"), @"Points and cosmetics");
 
@@ -39,7 +39,7 @@ Everything you play here counts here. Your scores, your pp and your leaderboard 
 
         public static LocalisableString ShortcutsTitle => new TranslatableString(getKey(@"shortcuts_title"), @"Shortcuts");
 
-        public static LocalisableString ShortcutsDescription => new TranslatableString(getKey(@"shortcuts_description"), @"Torii adds a shortcut osu! doesn't have: resize your cursor without opening settings.");
+        public static LocalisableString ShortcutsDescription => new TranslatableString(getKey(@"shortcuts_description"), @"Torii adds a shortcut the stock client doesn't have: resize your cursor without opening settings.");
 
         public static LocalisableString ShortcutsIncreaseCursorSize => new TranslatableString(getKey(@"shortcuts_increase_cursor_size"), @"Bigger cursor");
 
@@ -84,7 +84,7 @@ You can change this whenever you want from Settings, this is just the fastest pl
 
         public static LocalisableString OptionsLegacySongSelect => new TranslatableString(getKey(@"options_legacy_song_select"), @"Stable-style song select (might cause lag)");
 
-        public static LocalisableString OptionsLegacySongSelectHint => new TranslatableString(getKey(@"options_legacy_song_select_hint"), @"Makes song select look like osu!stable: the skinnable legacy footer and your rank panel, with the modern filter bar and info wedges hidden. It's experimental, so expect the odd rough edge.");
+        public static LocalisableString OptionsLegacySongSelectHint => new TranslatableString(getKey(@"options_legacy_song_select_hint"), @"Makes song select look like the classic stable layout: the skinnable legacy footer and your rank panel, with the modern filter bar and info wedges hidden. It's experimental, so expect the odd rough edge.");
 
         public static LocalisableString OptionsUserAuras => new TranslatableString(getKey(@"options_user_auras"), @"Show user auras");
 

@@ -10,11 +10,11 @@ permissions:
 
 jobs:
   sentry_release:
-    # torii: publica la release en el Sentry de ppy (sentry.ppy.sh, org ppy, proyecto osu) con un token
-    # que este fork no tiene ni deberia tener, asi que fallaba en cada release. Ni siquiera queremos que
-    # ande: seria mandar nuestra telemetria a la infra de ellos. Se deja el archivo para no conflictuar
-    # al sincronizar con upstream, y se apaga por repo.
-    if: github.repository == 'ppy/osu'
+    # torii: este workflow publicaba la release en el Sentry de ppy (org ppy, proyecto osu) con un token
+    # que este fork no tiene ni deberia tener. Ni siquiera queremos que ande: seria mandar nuestra
+    # telemetria a la infra de ellos. Se deja el archivo para no conflictuar al sincronizar con upstream,
+    # pero queda deshabilitado de forma incondicional (if: false) y sin ninguna referencia a sentry.ppy.sh.
+    if: false
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -28,7 +28,6 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: ppy
           SENTRY_PROJECT: osu
-          SENTRY_URL: https://sentry.ppy.sh/
         with:
           environment: production
           version: osu@${{ github.ref_name }}

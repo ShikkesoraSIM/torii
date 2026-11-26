@@ -3,13 +3,15 @@
 
 #nullable disable
 
+using System;
+
 namespace osu.Game.Users
 {
     public class Medal
     {
         public string Name { get; set; }
         public string InternalName { get; set; }
-        public string ImageUrl => $@"https://s.ppy.sh/images/medals-client/{InternalName}@2x.png";
+        public string ImageUrl => (Environment.GetEnvironmentVariable("TORII_WEB_URL")?.TrimEnd('/') ?? "https://lazer.shikkesora.com") + $"/image/achievement_images/{InternalName}@2x.png";
         public string Description { get; set; }
     }
 }

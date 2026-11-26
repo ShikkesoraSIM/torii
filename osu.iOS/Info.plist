@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleIdentifier</key>
-	<string>sh.ppy.osulazer</string>
+	<string>sh.shikkesora.torii</string>
 	<key>CFBundleName</key>
 	<string>Torii</string>
 	<key>CFBundleDisplayName</key>
@@ -40,7 +40,7 @@
 	</dict>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
-		<string>armv7</string>
+		<string>arm64</string>
 	</array>
 	<key>UIStatusBarHidden</key>
 	<true/>
@@ -48,12 +48,6 @@
 	<true/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
-	<key>NSCameraUsageDescription</key>
-	<string>We don't use the camera.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>We don't use the microphone.</string>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>We don't use Bluetooth.</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationLandscapeRight</string>
@@ -99,14 +93,14 @@
 				<string>public.data</string>
 			</array>
 			<key>UTTypeIdentifier</key>
-			<string>sh.ppy.osu.items</string>
+			<string>sh.shikkesora.torii.items</string>
 			<key>UTTypeTagSpecification</key>
 			<dict/>
 		</dict>
 		<dict>
 			<key>UTTypeConformsTo</key>
 			<array>
-				<string>sh.ppy.osu.items</string>
+				<string>sh.shikkesora.torii.items</string>
 			</array>
 			<key>UTTypeDescription</key>
 			<string>Torii replay</string>
@@ -121,7 +115,7 @@
 		<dict>
 			<key>UTTypeConformsTo</key>
 			<array>
-				<string>sh.ppy.osu.items</string>
+				<string>sh.shikkesora.torii.items</string>
 			</array>
 			<key>UTTypeDescription</key>
 			<string>Torii skin</string>
@@ -136,7 +130,7 @@
 		<dict>
 			<key>UTTypeConformsTo</key>
 			<array>
-				<string>sh.ppy.osu.items</string>
+				<string>sh.shikkesora.torii.items</string>
 			</array>
 			<key>UTTypeDescription</key>
 			<string>Torii beatmap</string>
@@ -151,7 +145,7 @@
 		<dict>
 			<key>UTTypeConformsTo</key>
 			<array>
-				<string>sh.ppy.osu.items</string>
+				<string>sh.shikkesora.torii.items</string>
 			</array>
 			<key>UTTypeDescription</key>
 			<string>Torii beatmap</string>
@@ -175,7 +169,7 @@
 			<string>Viewer</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>sh.ppy.osu.items</string>
+				<string>sh.shikkesora.torii.items</string>
 			</array>
 		</dict>
 	</array>

@@ -7,13 +7,14 @@ namespace osu.Game.Online
     {
         public ProductionEndpointConfiguration()
         {
-            WebsiteUrl = APIUrl = @"https://osu.ppy.sh";
+            WebsiteUrl = @"https://lazer.shikkesora.com";
+            APIUrl = @"https://lazer-api.shikkesora.com";
             APIClientSecret = @"FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk";
             APIClientID = "5";
-            SpectatorUrl = "https://spectator.osu.ppy.sh/spectator";
-            MultiplayerUrl = "https://spectator.osu.ppy.sh/multiplayer";
-            MetadataUrl = "https://spectator.osu.ppy.sh/metadata";
-            BeatmapSubmissionServiceUrl = "https://bss.ppy.sh";
+            SpectatorUrl = $@"{APIUrl}/signalr/spectator";
+            MultiplayerUrl = $@"{APIUrl}/signalr/multiplayer";
+            MetadataUrl = $@"{APIUrl}/signalr/metadata";
+            BeatmapSubmissionServiceUrl = $@"{APIUrl}/beatmap-submission";
         }
     }
 }

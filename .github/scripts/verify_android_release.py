@@ -27,10 +27,15 @@ def verify(apk, keystore, expected_code):
     if not package or package[1] != 'sh.shikkesora.torii' or package[2] != expected_code:
         raise ValueError('Android package identity/version code mismatch')
     with zipfile.ZipFile(apk) as archive:
-        for name in ('libbass.so', 'libbassmix.so', 'libbass_fx.so'):
-            if b'libc.so.6' in archive.read('lib/arm64-v8a/' + name):
-                raise ValueError('Desktop glibc audio library shipped inside Android APK')
-    print('Original certificate, application ID, version code and bionic audio verified.')
+        names = archive.namelist()
+        bass_entries = [n for n in names if 'bass' in Path(n).name.lower() and n.endswith('.so')]
+        if bass_entries:
+            raise ValueError('Proprietary BASS library shipped inside Android APK: ' + ', '.join(bass_entries))
+        if 'lib/arm64-v8a/libtorii_audio.so' not in names:
+            raise ValueError('Missing lib/arm64-v8a/libtorii_audio.so inside Android APK')
+        if b'libc.so.6' in archive.read('lib/arm64-v8a/libtorii_audio.so'):
+            raise ValueError('Desktop glibc torii_audio library shipped inside Android APK')
+    print('Original certificate, application ID, version code and bionic torii_audio verified (0 BASS libs).')
 
 
 if __name__ == '__main__':

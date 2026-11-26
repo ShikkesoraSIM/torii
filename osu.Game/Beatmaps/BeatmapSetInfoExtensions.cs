@@ -55,10 +55,12 @@ namespace osu.Game.Beatmaps
             if (beatmapSetInfo.OnlineID <= 0)
                 return null;
 
-            if (ruleset != null)
-                return $@"https://osu.ppy.sh/beatmapsets/{beatmapSetInfo.OnlineID}#{ruleset.ShortName}";
+            string webUrl = Environment.GetEnvironmentVariable("TORII_WEB_URL")?.TrimEnd('/') ?? "https://lazer.shikkesora.com";
 
-            return $@"https://osu.ppy.sh/beatmapsets/{beatmapSetInfo.OnlineID}";
+            if (ruleset != null)
+                return $@"{webUrl}/beatmapsets/{beatmapSetInfo.OnlineID}#{ruleset.ShortName}";
+
+            return $@"{webUrl}/beatmapsets/{beatmapSetInfo.OnlineID}";
         }
     }
 }

@@ -54,10 +54,10 @@ namespace osu.Game.Configuration
         }
 
         /// <summary>
-        /// Returns true if the supplied user is allowed to enable supporter-
-        /// gated cosmetic features (current OR past supporter). Centralised
-        /// so the runtime accent gate and the settings-panel UI gate
-        /// share one definition of "donator tier".
+        /// Returns true if the supplied user qualifies for Torii's own
+        /// donator-tier cosmetic unlocks (earned via Torii points, not
+        /// osu!supporter). Centralised so the runtime accent gate and the
+        /// settings-panel UI gate share one definition of "donator tier".
         /// </summary>
         public static bool IsDonatorTier(APIUser? user) => user != null && (user.IsSupporter || user.HasSupported);
 
@@ -65,9 +65,11 @@ namespace osu.Game.Configuration
         /// Resolves the donator-only accent hue. Returns a (hue, hasOverride)
         /// tuple — when <paramref name="config"/>'s
         /// <see cref="OsuSetting.CustomUIAccentEnabled"/> is off OR the
-        /// currently-logged-in user isn't a supporter, hasOverride is false
-        /// and the consumer should call <c>ResetAccentToBase()</c> on its
-        /// colour provider so the accent re-syncs with the chrome.
+        /// Torii donator cosmetic unlock
+        /// (<see cref="OsuSetting.CustomUIAccentUnlocked"/>) hasn't been
+        /// earned, hasOverride is false and the consumer should call
+        /// <c>ResetAccentToBase()</c> on its colour provider so the accent
+        /// re-syncs with the chrome.
         /// </summary>
         /// <remarks>
         /// The accent ALSO respects the per-scope toggles — turning off the
@@ -75,12 +77,12 @@ namespace osu.Game.Configuration
         /// you'd get the absurd state of a chrome-default overlay with a
         /// pink accent slapped on top.
         /// <para/>
-        /// The supporter check is what stops a non-supporter from inheriting
-        /// a previous supporter user's CustomUIAccentEnabled / CustomUIAccentHue
-        /// values from the per-machine osu.cfg. The values themselves stay in
-        /// config (so a temporary tag expiry doesn't wipe the user's choice)
-        /// — they're just ignored by the runtime resolver while no qualifying
-        /// user is signed in.
+        /// The unlock check is what stops a user who hasn't earned Torii's
+        /// donator cosmetic from inheriting a previous user's
+        /// CustomUIAccentEnabled / CustomUIAccentHue values from the
+        /// per-machine osu.cfg. The values themselves stay in config (so a
+        /// temporary unlock lapse doesn't wipe the user's choice) — they're
+        /// just ignored by the runtime resolver while the unlock isn't held.
         /// </remarks>
         public static (int hue, bool hasOverride) ResolveAccentHue(OsuConfigManager config, int fallbackHue, CustomUiHueScope scope, APIUser? currentUser = null)
         {
@@ -122,10 +124,10 @@ namespace osu.Game.Configuration
         /// </summary>
         /// <remarks>
         /// Pass <paramref name="api"/> when available so the accent is
-        /// gated on the local user's supporter status — without it the
+        /// re-evaluated when the local user changes — without it the
         /// accent would still apply for anyone using a machine that
-        /// previously had a supporter signed in (the values persist in
-        /// per-machine osu.cfg, not per-user).
+        /// previously had a qualifying user signed in (the values persist
+        /// in per-machine osu.cfg, not per-user).
         /// </remarks>
         public static IDisposable BindFullScheme(OsuConfigManager config, OverlayColourProvider provider, int fallbackHue, CustomUiHueScope scope, IAPIProvider? api = null)
             => new CustomUiFullSchemeBinding(config, provider, fallbackHue, scope, api);
@@ -187,10 +189,9 @@ namespace osu.Game.Configuration
         // OverlayColourProvider in one ColoursChanged firing. Avoids the
         // double-paint that would happen if a consumer wired a plain
         // BindHue + a separate accent binding to the same provider.
-        // Also gates the accent on the locally-signed-in user's supporter
-        // status — re-fires whenever the local user changes (login /
-        // logout / account switch) so a stale supporter config can't
-        // bleed into a non-supporter session.
+        // Also re-evaluates the accent whenever the local user changes
+        // (login / logout / account switch) so a stale config from a
+        // previous session can't bleed into the current one.
         private sealed class CustomUiFullSchemeBinding : IDisposable
         {
             private readonly OsuConfigManager config;

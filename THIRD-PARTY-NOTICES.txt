@@ -10,7 +10,7 @@ or sponsored by ppy Pty Ltd.
 
 Copyright (c) 2025 ppy Pty Ltd <contact@ppy.sh>
 Source: https://github.com/ppy/osu
-Licence: MIT
+Licence: MIT (full text in ./LICENCE)
 
 Torii is a modified derivative of this source. Modifications were made by the
 Torii project and are not the work of ppy Pty Ltd.
@@ -84,37 +84,125 @@ this software it is a factual reference to the upstream project, not a claim of
 affiliation.
 
 ================================================================================
-4. Inter
+4. Satori Garbage Collector
 ================================================================================
 
-Copyright (c) 2016 The Inter Project Authors
-Source: https://github.com/rsms/inter
-Licence: SIL Open Font License 1.1
-Licence text: https://openfontlicense.org/
+Copyright (c) 2025 Vladimir Sadov
+Source: https://github.com/VSadov/Satori
+Licence: MIT (full text as reproduced in section 1)
 
 ================================================================================
-5. Noto Fonts
+5. torii_audio native engine third-party libraries (when enabled)
 ================================================================================
 
-Copyright (c) Google LLC
-Source: https://github.com/notofonts
-Licence: Apache License 2.0
-Licence text: https://www.apache.org/licenses/LICENSE-2.0
+The torii_audio native engine optionally bundles the following libraries. They
+are only present in builds where the native engine is enabled.
+
+5.1 miniaudio
+    Copyright (c) David Reid
+    Licence: Public Domain / MIT-0
+    Source: https://github.com/mackron/miniaudio
+
+5.2 stb_vorbis
+    Copyright (c) Sean Barrett
+    Licence: Public Domain
+    Source: https://github.com/nothings/stb
+
+5.3 signalsmith-stretch & signalsmith-linear
+    Copyright (c) Geraint Luff
+    Licence: MIT (full text as reproduced in section 1)
+    Source: https://github.com/Signalsmith-Audio/signalsmith-stretch
 
 ================================================================================
-6. Nunito
+6. OpenTabletDriver v0.6.7
 ================================================================================
 
-Copyright (c) The Nunito Project Authors
-Source: https://github.com/googlefonts/nunito
-Licence: SIL Open Font License 1.1
-Licence text: https://openfontlicense.org/
+Copyright (c) OpenTabletDriver contributors
+Source: https://github.com/OpenTabletDriver/OpenTabletDriver/tree/v0.6.7
+Licence: GNU Lesser General Public License v3.0 (LGPL-3.0)
+Licence text: https://www.gnu.org/licenses/lgpl-3.0.html
 
-Modified by Torii: rendered to bitmap font atlases (BMFont binary format) for
-use with osu!framework. The outlines themselves are unmodified.
+On desktop platforms Torii dynamically links against OpenTabletDriver v0.6.7.
+The library is used unmodified. Source code for the exact version used is
+available at the URL above. Users may replace the dynamically linked library
+with a compatible version of their own build.
 
 ================================================================================
-7. Aller
+7. FFmpeg
+================================================================================
+
+Copyright (c) FFmpeg developers
+Source: https://ffmpeg.org/download.html
+Licence: GNU Lesser General Public License v2.1 (LGPL-2.1)
+Licence text: https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
+
+Torii dynamically links against FFmpeg. The library is used unmodified. Source
+code for the exact version used is available at the URL above. Users may
+replace the dynamically linked library with a compatible version of their own
+build.
+
+================================================================================
+8. SixLabors.ImageSharp
+================================================================================
+
+Copyright (c) Six Labors
+Source: https://github.com/SixLabors/ImageSharp
+Licence: Six Labors Split License
+Licence text: https://github.com/SixLabors/ImageSharp/blob/main/LICENSE
+
+Torii uses SixLabors.ImageSharp under the grant for entities with less than
+$1,000,000 USD in annual gross revenue. If your use does not qualify for this
+grant, you must obtain a commercial licence from Six Labors.
+
+================================================================================
+9. Fonts
+================================================================================
+
+9.1 Inter
+    Copyright (c) 2016 The Inter Project Authors
+    Source: https://github.com/rsms/inter
+    Licence: SIL Open Font License 1.1
+    Licence text: https://openfontlicense.org/
+
+9.2 Nunito
+    Copyright (c) The Nunito Project Authors
+    Source: https://github.com/googlefonts/nunito
+    Licence: SIL Open Font License 1.1
+    Licence text: https://openfontlicense.org/
+
+    Modified by Torii: rendered to bitmap font atlases (BMFont binary format)
+    for use with osu!framework. The outlines themselves are unmodified.
+
+9.3 Maple Mono
+    Copyright (c) Maple Mono Project Authors
+    Source: https://github.com/subframe7536/maple-font
+    Licence: SIL Open Font License 1.1
+    Licence text: https://openfontlicense.org/
+
+9.4 Noto & Roboto
+    Copyright (c) Google LLC
+    Source: https://github.com/notofonts and https://github.com/googlefonts/roboto
+    Licence: Apache License 2.0
+    Licence text: https://www.apache.org/licenses/LICENSE-2.0
+
+9.5 Font Awesome 5 Free
+    Copyright (c) Fonticons, Inc.
+    Source: https://github.com/FortAwesome/Font-Awesome
+    Licence: CC BY 4.0 / SIL OFL 1.1 / MIT
+    Licence texts: https://creativecommons.org/licenses/by/4.0/legalcode
+                   https://openfontlicense.org/
+                   (MIT text as reproduced in section 1)
+
+================================================================================
+10. osu-framework-native / libosu_native
+================================================================================
+
+Copyright (c) ppy Pty Ltd <contact@ppy.sh>
+Source: https://github.com/ppy/osu-framework
+Licence: MIT (full text as reproduced in section 1)
+
+================================================================================
+11. Aller
 ================================================================================
 
 Copyright (c) Dalton Maag Ltd

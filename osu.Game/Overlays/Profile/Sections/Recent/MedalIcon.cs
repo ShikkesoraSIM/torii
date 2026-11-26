@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
@@ -15,7 +16,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
         private readonly string slug;
         private readonly Sprite sprite;
 
-        private string url => $@"https://s.ppy.sh/images/medals-client/{slug}@2x.png";
+        private string url => (Environment.GetEnvironmentVariable("TORII_WEB_URL")?.TrimEnd('/') ?? "https://lazer.shikkesora.com") + $"/image/achievement_images/{slug}@2x.png";
 
         public MedalIcon(string slug)
         {

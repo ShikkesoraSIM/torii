@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: ShikkesoraSIM/torii-framework
-          ref: 977ba8e93bdc409f31eaad909819f5fbacd113c1
+          ref: e07b38795275f49db1863d3b401385c145010b98
           path: torii-framework
           persist-credentials: false
       - uses: actions/checkout@v4
