@@ -172,7 +172,8 @@ namespace osu.Game.Beatmaps
                     return;
 
                 default:
-                    platformOffsetClock.Offset = -extraBufferDelayMs;
+                    // Keep non-Windows platforms (macOS, Linux, Android, iOS) at 0 until measured empirically on real hardware.
+                    platformOffsetClock.Offset = 0;
                     break;
             }
         }
