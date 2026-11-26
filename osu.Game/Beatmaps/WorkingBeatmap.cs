@@ -122,21 +122,28 @@ namespace osu.Game.Beatmaps
 
         public void PrepareTrackForPreview(bool looping, double? offsetFromPreviewPoint = null)
         {
-            Track.Looping = looping;
-            Track.RestartPoint = Metadata.PreviewTime;
+            var targetTrack = Track;
+            targetTrack.Looping = looping;
 
-            if (!Track.IsLoaded)
+            double previewTime = Metadata.PreviewTime;
+            double offset = offsetFromPreviewPoint ?? -MusicController.DELAY_BEFORE_FADE;
+
+            if (!targetTrack.IsLoaded)
+                targetTrack.RestartPoint = previewTime >= 0 ? Math.Max(0, previewTime + offset) : 0;
+
+            // Avoid synchronously blocking the update thread on Track.Seek() while TrackBass finishes
+            // opening/decoding on the audio thread. Enqueuing on the track's FIFO audio-thread queue
+            // guarantees this runs strictly after prepareStream() populates Length and strictly before
+            // any subsequent Restart()/RestartAsync() call reads RestartPoint.
+            targetTrack.SetRestartPointWhenLoaded(length =>
             {
-                // force length to be populated (https://github.com/ppy/osu-framework/issues/4202)
-                Track.Seek(Track.CurrentTime);
-            }
+                double restartPoint = previewTime;
 
-            if (Track.RestartPoint < 0 || Track.RestartPoint > Track.Length)
-                Track.RestartPoint = 0.4f * Track.Length;
+                if (restartPoint < 0 || restartPoint > length)
+                    restartPoint = 0.4f * length;
 
-            offsetFromPreviewPoint ??= -MusicController.DELAY_BEFORE_FADE;
-
-            Track.RestartPoint = Math.Clamp(Track.RestartPoint + offsetFromPreviewPoint.Value, 0, Track.Length);
+                return Math.Clamp(restartPoint + offset, 0, length);
+            });
         }
 
         /// <summary>

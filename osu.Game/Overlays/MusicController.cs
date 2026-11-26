@@ -463,6 +463,26 @@ namespace osu.Game.Overlays
                  .Where(i => (allowProtectedTracks || !i.Value.Protected)
                              && (SeasonalUIConfig.ENABLED || i.Value.Hash != IntroChristmas.CHRISTMAS_BEATMAP_SET_HASH));
 
+        private TrackChangeDirection getTrackChangeDirection(Guid currentSetId, Guid newSetId)
+        {
+            if (currentSetId == newSetId)
+                return TrackChangeDirection.Next;
+
+            foreach (var set in realm.Realm.All<BeatmapSetInfo>().Where(s => !s.DeletePending))
+            {
+                if (set.Protected || (!SeasonalUIConfig.ENABLED && set.Hash == IntroChristmas.CHRISTMAS_BEATMAP_SET_HASH))
+                    continue;
+
+                if (set.ID == newSetId)
+                    return TrackChangeDirection.Prev;
+
+                if (set.ID == currentSetId)
+                    return TrackChangeDirection.Next;
+            }
+
+            return TrackChangeDirection.Next;
+        }
+
         private void changeBeatmap(WorkingBeatmap newWorking)
         {
             // This method can potentially be triggered multiple times as it is eagerly fired in next() / prev() to ensure correct execution order
@@ -487,11 +507,9 @@ namespace osu.Game.Overlays
                 }
                 else
                 {
-                    // figure out the best direction based on order in playlist.
-                    int last = getBeatmapSets(allowProtectedTracks: false).TakeWhile(b => !b.Value.Equals(current.BeatmapSetInfo)).Count();
-                    int next = getBeatmapSets(allowProtectedTracks: false).TakeWhile(b => !b.Value.Equals(newWorking.BeatmapSetInfo)).Count();
-
-                    direction = last > next ? TrackChangeDirection.Prev : TrackChangeDirection.Next;
+                    // Single-pass direction lookup directly on Realm without allocating RealmLive wrappers
+                    // or scanning the entire BeatmapSetInfo table twice on every song click.
+                    direction = getTrackChangeDirection(current.BeatmapSetInfo.ID, newWorking.BeatmapSetInfo.ID);
                 }
             }
 

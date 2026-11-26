@@ -254,6 +254,7 @@ namespace osu.Game.Screens.Select
             starDifficultyBindable = null;
 
             starDifficultyCancellationSource?.Cancel();
+            starDifficultyCancellationSource = null;
         }
 
         private void computeStarRating()

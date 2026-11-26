@@ -258,13 +258,17 @@ namespace osu.Game.Screens.Select
         }
 
         private const double transition_duration = 300;
+        private bool displayDirty = true;
 
         protected override void PopIn()
         {
             this.FadeIn(transition_duration, Easing.OutQuint)
                 .MoveToX(0, transition_duration, Easing.OutQuint);
 
-            updateSubWedgeVisibility();
+            if (displayDirty)
+                updateDisplay();
+            else
+                updateSubWedgeVisibility();
         }
 
         protected override void PopOut()
@@ -345,6 +349,15 @@ namespace osu.Game.Screens.Select
 
         private void updateDisplay()
         {
+            if (State.Value != Visibility.Visible)
+            {
+                displayDirty = true;
+                userTagsCancellationSource?.Cancel();
+                return;
+            }
+
+            displayDirty = false;
+
             var metadata = beatmap.Value.Metadata;
             var beatmapSetInfo = beatmap.Value.BeatmapSetInfo;
 

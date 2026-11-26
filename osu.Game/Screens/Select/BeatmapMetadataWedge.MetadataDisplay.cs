@@ -141,7 +141,9 @@ namespace osu.Game.Screens.Select
             protected override void Update()
             {
                 base.Update();
-                contentLinkText.MaxWidth = ChildSize.X;
+
+                if (contentLinkText.MaxWidth != ChildSize.X)
+                    contentLinkText.MaxWidth = ChildSize.X;
             }
 
             private void clear()

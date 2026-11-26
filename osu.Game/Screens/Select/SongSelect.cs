@@ -715,6 +715,10 @@ namespace osu.Game.Screens.Select
             });
         }
 
+        private float lastWidescreenBonusWidth = float.NaN;
+        private float lastLegacyListWidth = float.NaN;
+        private bool? lastColumnDimensionsLegacy;
+
         protected override void Update()
         {
             base.Update();
@@ -724,22 +728,32 @@ namespace osu.Game.Screens.Select
 
             detailsArea.Height = wedgesContainer.ChildSize.Y - titleWedge.LayoutSize.Y - 4;
 
+            bool isLegacy = legacyUi.Value;
             float widescreenBonusWidth = Math.Max(0, DrawWidth / DrawHeight - 2f);
+            float legacyListWidth = Math.Min(DrawWidth, 614.4f);
 
-            mainGridContainer.ColumnDimensions = legacyUi.Value
-                ? new[]
-                {
-                    new Dimension(),
-                    new Dimension(GridSizeMode.Absolute, 0),
-                    // Stable positions the list from the right edge in height-scaled units.
-                    new Dimension(GridSizeMode.Absolute, Math.Min(DrawWidth, 614.4f)),
-                }
-                : new[]
-                {
-                    new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 700 + widescreenBonusWidth * 100),
-                    new Dimension(),
-                    new Dimension(GridSizeMode.Relative, 0.5f, minSize: 500, maxSize: 700 + widescreenBonusWidth * 300),
-                };
+            if (lastColumnDimensionsLegacy != isLegacy
+                || (isLegacy ? legacyListWidth != lastLegacyListWidth : widescreenBonusWidth != lastWidescreenBonusWidth))
+            {
+                lastColumnDimensionsLegacy = isLegacy;
+                lastWidescreenBonusWidth = widescreenBonusWidth;
+                lastLegacyListWidth = legacyListWidth;
+
+                mainGridContainer.ColumnDimensions = isLegacy
+                    ? new[]
+                    {
+                        new Dimension(),
+                        new Dimension(GridSizeMode.Absolute, 0),
+                        // Stable positions the list from the right edge in height-scaled units.
+                        new Dimension(GridSizeMode.Absolute, legacyListWidth),
+                    }
+                    : new[]
+                    {
+                        new Dimension(GridSizeMode.Relative, 0.5f, maxSize: 700 + widescreenBonusWidth * 100),
+                        new Dimension(),
+                        new Dimension(GridSizeMode.Relative, 0.5f, minSize: 500, maxSize: 700 + widescreenBonusWidth * 300),
+                    };
+            }
 
             if (this.IsCurrentScreen())
                 updateDebounce();

@@ -804,7 +804,7 @@ namespace osu.Game.Screens.Select
             if (set == null)
                 return;
 
-            bool canMakeVisible = !grouping.GroupItems.Any() || ExpandedGroup == set.Group;
+            bool canMakeVisible = grouping.GroupItems.Count == 0 || ExpandedGroup == set.Group;
 
             if (grouping.SetItems.TryGetValue(set, out var items))
             {

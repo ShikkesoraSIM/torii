@@ -238,7 +238,8 @@ namespace osu.Game.Screens.Select
 
         public void RefetchScores()
         {
-            SetScores(Array.Empty<ScoreInfo>());
+            cancellationTokenSource?.Cancel();
+            clearScores();
 
             if (beatmap.IsDefault)
             {

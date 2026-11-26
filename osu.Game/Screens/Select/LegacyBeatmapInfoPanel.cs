@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
@@ -50,6 +51,11 @@ namespace osu.Game.Screens.Select
         [Resolved]
         private SkinManager skins { get; set; } = null!;
 
+        [Resolved]
+        private OsuConfigManager config { get; set; } = null!;
+
+        private Bindable<bool> legacyActive = null!;
+
         private Sprite statusIcon = null!;
         private SpriteIcon statusGlyph = null!;
         private OsuSpriteText titleText = null!;
@@ -82,6 +88,7 @@ namespace osu.Game.Screens.Select
         // valor subido por mods = mas dificil = calido; bajado = mas facil = frio.
         private static readonly Color4 harder_colour = new Color4(255, 102, 102, 255);
         private static readonly Color4 easier_colour = new Color4(130, 220, 130, 255);
+        private static readonly string[] preferred_stat_order = { @"CS", @"AR", @"OD", @"HP" };
 
         private static string formatCounts(WorkingBeatmap working)
         {
@@ -190,22 +197,60 @@ namespace osu.Game.Screens.Select
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            beatmap.BindValueChanged(_ => updateDisplay(), true);
+
+            legacyActive = config.GetBindable<bool>(OsuSetting.ToriiLegacyFooterUseSkin);
+            legacyActive.BindValueChanged(e =>
+            {
+                if (e.NewValue)
+                    updateDisplay();
+                else
+                    cancelPendingWork();
+            }, true);
+
+            beatmap.BindValueChanged(_ =>
+            {
+                if (legacyActive.Value)
+                    updateDisplay();
+            });
             // mods y ruleset afectan la linea de length/BPM y la de stats; el bindable de star
             // rating de abajo ya trackea los cambios de mod/ruleset por su cuenta.
-            mods.BindValueChanged(_ => Scheduler.AddOnce(refreshModSensitiveLines));
+            mods.BindValueChanged(_ =>
+            {
+                if (legacyActive.Value)
+                    Scheduler.AddOnce(refreshModSensitiveLines);
+            });
             ruleset.BindValueChanged(_ =>
             {
+                if (!legacyActive.Value)
+                    return;
+
                 // el baseline sin mods depende del ruleset (convertidos cambian de SR).
                 refreshBaselineStars();
                 Scheduler.AddOnce(refreshModSensitiveLines);
             });
         }
 
+        private void cancelPendingWork()
+        {
+            countsCancellation?.Cancel();
+            countsCancellation = null;
+
+            starCancellation?.Cancel();
+            starCancellation = null;
+            starDifficulty?.UnbindAll();
+            starDifficulty = null;
+
+            baselineCancellation?.Cancel();
+            baselineCancellation = null;
+        }
+
         private void refreshBaselineStars()
         {
             baselineCancellation?.Cancel();
             baselineStars = null;
+
+            if (!legacyActive.Value)
+                return;
 
             var info = beatmap.Value.BeatmapInfo;
             var token = (baselineCancellation = new CancellationTokenSource()).Token;
@@ -228,6 +273,9 @@ namespace osu.Game.Screens.Select
 
         private void updateDisplay()
         {
+            if (!legacyActive.Value)
+                return;
+
             var working = beatmap.Value;
             var info = working.BeatmapInfo;
             var metadata = info.Metadata;
@@ -252,6 +300,7 @@ namespace osu.Game.Screens.Select
             // esta decodeado en memoria lo usamos directo; si no, decodeamos en un task de fondo
             // (los mapas grandes tardan unas decenas de ms) y llenamos la linea cuando termina.
             countsCancellation?.Cancel();
+            countsCancellation = null;
 
             if (working.BeatmapLoaded)
                 countsText.Text = formatCounts(working);
@@ -294,6 +343,9 @@ namespace osu.Game.Screens.Select
 
         private void refreshModSensitiveLines()
         {
+            if (!legacyActive.Value)
+                return;
+
             refreshLengthLine();
             refreshStatsLine();
         }
@@ -328,12 +380,10 @@ namespace osu.Game.Screens.Select
             }
 
             // primero el orden de stats de stable (CS AR OD HP), despues los extras del ruleset.
-            string[] preferredOrder = { @"CS", @"AR", @"OD", @"HP" };
-
             var attributes = rulesetInstance.GetBeatmapAttributesForDisplay(info, mods.Value)
                                             .OrderBy(a =>
                                             {
-                                                int i = Array.IndexOf(preferredOrder, a.Acronym);
+                                                int i = Array.IndexOf(preferred_stat_order, a.Acronym);
                                                 return i < 0 ? int.MaxValue : i;
                                             });
 
@@ -368,9 +418,7 @@ namespace osu.Game.Screens.Select
 
         protected override void Dispose(bool isDisposing)
         {
-            countsCancellation?.Cancel();
-            starCancellation?.Cancel();
-            baselineCancellation?.Cancel();
+            cancelPendingWork();
             base.Dispose(isDisposing);
         }
 

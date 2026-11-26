@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Utils;
 using osu.Game.Screens.Backgrounds;
@@ -59,6 +60,8 @@ namespace osu.Game.Screens.Select
         private Quad lastAlignedQuad;
 
         private Drawable? currentContent;
+        private WorkingBeatmap? currentBeatmap;
+        private CancellationTokenSource? loadCancellation;
 
         public PanelBackdrop(float blurSigma)
         {
@@ -99,6 +102,14 @@ namespace osu.Game.Screens.Select
         {
             var beatmap = e.NewValue;
 
+            if (currentBeatmap != null && beatmap != null && currentBeatmap.BeatmapInfo.BackgroundEquals(beatmap.BeatmapInfo))
+                return;
+
+            currentBeatmap = beatmap;
+
+            loadCancellation?.Cancel();
+            loadCancellation = null;
+
             var previous = currentContent;
             currentContent = null;
 
@@ -124,17 +135,41 @@ namespace osu.Game.Screens.Select
             };
             currentContent = newSprite;
 
+            var cts = loadCancellation = new CancellationTokenSource();
+
             // GetBackground() (disco + upload de textura) corre en el hilo async, no traba el update thread.
             LoadComponentAsync(newSprite, loaded =>
             {
+                if (cts.IsCancellationRequested)
+                {
+                    loaded.Dispose();
+                    return;
+                }
+
+                // Fade out any previously added sprites so rapid switches never leave leaked sprites behind.
+                foreach (var child in spriteContainer)
+                {
+                    if (child.LifetimeEnd == double.MaxValue)
+                        child.FadeOut(300, Easing.OutQuint).Expire();
+                }
+
                 spriteContainer.Add(loaded);
                 loaded.FadeIn(300, Easing.OutQuint);
-                previous?.FadeOut(300, Easing.OutQuint).Expire();
+
+                // Reset alignment quad so the newly loaded sprite aligns immediately.
+                lastAlignedQuad = default;
 
                 // La carga es async: cuando termina, la ventana que abrimos al pedir el mapa ya
                 // pudo haberse cerrado. La reabrimos desde ahora, que es cuando arranca el fade.
                 redrawUntil = Time.Current + 320;
-            });
+            }, cts.Token);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            loadCancellation?.Cancel();
+            loadCancellation = null;
+            base.Dispose(isDisposing);
         }
 
         protected override void Update()
@@ -193,8 +228,9 @@ namespace osu.Game.Screens.Select
 
             var quad = real.ScreenSpaceDrawQuad;
 
-            bool cambio = !Precision.AlmostEquals(quad.TopLeft, lastAlignedQuad.TopLeft)
-                          || !Precision.AlmostEquals(quad.BottomRight, lastAlignedQuad.BottomRight);
+            // Half-res heavy Gaussian blur doesn't need sub-half-pixel redraws on tiny parallax jitter.
+            bool cambio = !Precision.AlmostEquals(quad.TopLeft, lastAlignedQuad.TopLeft, 0.5f)
+                          || !Precision.AlmostEquals(quad.BottomRight, lastAlignedQuad.BottomRight, 0.5f);
 
             if (!cambio)
                 return false;

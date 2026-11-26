@@ -41,6 +41,12 @@ namespace osu.Game.Screens.Select
                 get => tags;
                 set
                 {
+                    if (tags.Length == 0 && value.Length == 0)
+                        return;
+
+                    if (tags.SequenceEqual(value))
+                        return;
+
                     tags = value;
                     updateTags();
                 }

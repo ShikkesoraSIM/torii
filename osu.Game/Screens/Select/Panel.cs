@@ -336,10 +336,10 @@ namespace osu.Game.Screens.Select
             // This assumes a minimum depth of -2 (groups).
             selectionLayer.DepthLayer = -Item!.DepthLayer;
 
+            // updateAccentColour already refreshes selected state without animation.
             updateAccentColour();
 
             updateXOffset(animated: false);
-            updateSelectedState(animated: false);
 
             updateLegacyAppearance();
 
@@ -475,7 +475,10 @@ namespace osu.Game.Screens.Select
         protected override void Update()
         {
             base.Update();
-            contentPaddingContainer.Padding = contentPaddingContainer.Padding with { Left = IsLegacySongSelectAppearance ? 0 : iconContainer.DrawWidth };
+
+            float targetLeft = IsLegacySongSelectAppearance ? 0 : iconContainer.DrawWidth;
+            if (contentPaddingContainer.Padding.Left != targetLeft)
+                contentPaddingContainer.Padding = contentPaddingContainer.Padding with { Left = targetLeft };
         }
 
         protected virtual void OnLegacyAppearanceChanged(bool legacy) { }
