@@ -135,9 +135,30 @@ namespace osu.Game.Graphics
         /// <returns>The string representation of <paramref name="weight"/> in the specified <paramref name="family"/>.</returns>
         public static string GetWeightString(string family, FontWeight weight)
         {
-            if ((family == GetFamilyString(Typeface.Torus) || family == GetFamilyString(Typeface.TorusAlternate)) && weight == FontWeight.Medium)
-                // torus doesn't have a medium; fallback to regular.
-                weight = FontWeight.Regular;
+            switch (family)
+            {
+                case @"Inter":
+                    // Shipped Inter weights: Light, Regular, SemiBold, Bold (no Medium or Black).
+                    if (weight == FontWeight.Medium)
+                        weight = FontWeight.Regular;
+                    else if (weight == FontWeight.Black)
+                        weight = FontWeight.Bold;
+                    break;
+
+                case @"Nunito":
+                    // Shipped Nunito weights: Light, Regular, Medium, SemiBold, Bold (no Black).
+                    if (weight == FontWeight.Black)
+                        weight = FontWeight.Bold;
+                    break;
+
+                case @"MapleMono":
+                    // Registered MapleMono weights: Regular, Medium, Bold.
+                    if (weight == FontWeight.Light)
+                        weight = FontWeight.Regular;
+                    else if (weight == FontWeight.SemiBold || weight == FontWeight.Black)
+                        weight = FontWeight.Bold;
+                    break;
+            }
 
             return weight.ToString();
         }

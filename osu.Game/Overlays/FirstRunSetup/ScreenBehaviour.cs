@@ -226,9 +226,9 @@ namespace osu.Game.Overlays.FirstRunSetup
 
             if (osuRulesetSettings != null)
             {
-                foreach (var boolControl in osuRulesetSettings.ChildrenOfType<IHasCurrentValue<bool>>())
+                foreach (var formControl in osuRulesetSettings.ChildrenOfType<IFormControl>())
                 {
-                    if (!boolControl.Current.IsDefault)
+                    if (!formControl.IsDefault)
                     {
                         allAlreadyDefault = false;
                         break;

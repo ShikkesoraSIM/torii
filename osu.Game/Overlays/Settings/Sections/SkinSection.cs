@@ -120,6 +120,17 @@ namespace osu.Game.Overlays.Settings.Sections
                     Action = () => skins.ReloadCurrentSkin(audioOnly: false, notify: true),
                     Keywords = new[] { "skin", "reload", "refresh", "hot", "torii" },
                 }),
+                new SkinFavouriteButton(),
+                CreateItem(new CheckboxEntry
+                {
+                    Caption = SkinSettingsStrings.CycleSkinsThroughFavoritesOnly,
+                    HintText = SkinSettingsStrings.CycleSkinsThroughFavoritesOnlyDescription,
+                    Current = config.GetBindable<bool>(OsuSetting.CycleSkinsThroughFavoritesOnly),
+                    Keywords = new[] { "skin", "cycle", "favourite", "favorite", "pin", "hotkey", "keybind" },
+                }),
+                // torii: el dropdown del UI theme cosmetico, mirroreado aca (tambien vive en Torii >
+                // Menus, mismo key) porque quien navega skins espera el switch de paleta cerca.
+                new UIThemeDropdownAndRestart(),
             };
         }
 
@@ -134,7 +145,11 @@ namespace osu.Game.Overlays.Settings.Sections
                 Current = skins.CurrentSkinInfo,
                 AlwaysShowSearchBar = true,
                 AllowNonContiguousMatching = true,
-                ItemLabel = item => item.ToString(),
+                ItemLabel = item =>
+                {
+                    bool pinned = skins.PinnedSkins.IsPinned(item.ID);
+                    return item.PerformRead(s => pinned ? $"♥ {s}" : s.ToString());
+                },
             };
 
             // the dropdown must start with the skins in it: binding it to an empty list would reset the current skin.
@@ -275,7 +290,11 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             dropdownItems.Clear();
             dropdownItems.AddRange(skins.GetAllUsableSkins());
-            skinDropdown.Items = dropdownItems;
+
+            if (skinDropdown != null)
+                skinDropdown.Items = dropdownItems;
+            else
+                skinEntry?.SetItems(dropdownItems);
         });
 
         protected override void Dispose(bool isDisposing)

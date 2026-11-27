@@ -553,7 +553,7 @@ namespace osu.Game
         private void onWindowDragDrop(string path)
         {
             // on macOS/iOS, URL associations are handled via SDL_DROPFILE events.
-            if (path.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
+            if (IsSupportedProtocolLink(path))
             {
                 HandleLink(path);
                 return;
@@ -1966,7 +1966,7 @@ namespace osu.Game
                 {
                     string firstPath = paths.First();
 
-                    if (firstPath.StartsWith(OSU_PROTOCOL, StringComparison.Ordinal))
+                    if (IsSupportedProtocolLink(firstPath))
                     {
                         HandleLink(firstPath);
                     }

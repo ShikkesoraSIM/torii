@@ -81,8 +81,6 @@ namespace osu.Game.Overlays
 
         // Torii custom UI hue: re-tints the panel live when the user changes the hue.
         private System.IDisposable customUiHueBinding;
-        // torii DARK GLASS: GlassBackdrop en vez de Box plano, para blurear la escena detras del panel.
-        private GlassBackdrop panelBackground = null!;
 
         [Resolved(CanBeNull = true)]
         private osu.Game.Online.API.IAPIProvider api { get; set; }
@@ -137,9 +135,7 @@ namespace osu.Game.Overlays
                 }
             };
 
-            // Subscribe BEFORE binding so the initial apply re-paints the panel with the
-            // resolved hue, and re-tint live whenever the user changes the hue setting.
-            colourProvider.ColoursChanged += updateTheme;
+            // Bind live custom UI hue updates into the panel's OverlayColourProvider.
             customUiHueBinding = CustomUiHueHelper.BindFullScheme(config, colourProvider, OverlayColourScheme.Purple.GetHue(), CustomUiHueScope.SettingsPanel, api);
 
             Add(new PopoverContainer
@@ -246,20 +242,12 @@ namespace osu.Game.Overlays
 
         private const double fade_in_duration = 500;
 
-        private void updateTheme()
-        {
-            if (panelBackground != null)
-                panelBackground.TintColour = colourProvider.Background4.Opacity(ThemeAware.GlassAlpha(0.8f)); // torii dark glass
-        }
-
         protected override void Dispose(bool isDisposing)
         {
             if (isDisposing)
             {
                 customUiHueBinding?.Dispose();
                 customUiHueBinding = null;
-                if (colourProvider != null)
-                    colourProvider.ColoursChanged -= updateTheme;
             }
 
             base.Dispose(isDisposing);

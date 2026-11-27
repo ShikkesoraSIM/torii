@@ -129,7 +129,7 @@ namespace osu.Game.Overlays.Wiki
         }
 
         private void updateGithubPath(APIWikiPage page)
-            => githubPath.Value = $"{github_wiki_base}/{page.Path}/{page.Locale}.md";
+            => githubPath.Value = $"{github_wiki_base}/{page.Locale}/{page.Path}";
 
         private static Language[] getAvailableLanguages(APIWikiPage page)
         {
@@ -180,7 +180,7 @@ namespace osu.Game.Overlays.Wiki
             public readonly Bindable<string> TargetPath = new Bindable<string>();
 
             [BackgroundDependencyLoader(true)]
-            private void load([CanBeNull] ILinkHandler linkHandler)
+            private void load([CanBeNull] OsuGame game)
             {
                 Width = 42;
 
@@ -192,7 +192,11 @@ namespace osu.Game.Overlays.Wiki
                     Icon = FontAwesome.Brands.Github,
                 });
 
-                Action = () => linkHandler?.HandleLink(TargetPath.Value);
+                Action = () =>
+                {
+                    if (!string.IsNullOrEmpty(TargetPath.Value))
+                        game?.OpenUrlExternally(TargetPath.Value);
+                };
             }
 
             protected override void LoadComplete()

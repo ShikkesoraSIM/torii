@@ -23,5 +23,10 @@ namespace osu.Game.Overlays.Settings.Rendering.Stable
             Colour = M.SIDEBAR_BACKGROUND,
             RelativeSizeAxes = Axes.Both,
         };
+
+        // Classic sidebar always keeps its fixed #080808 strip regardless of live CustomUIHue changes.
+        protected override void UpdateTheme()
+        {
+        }
     }
 }

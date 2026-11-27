@@ -6,6 +6,7 @@ using System.Numerics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
@@ -14,6 +15,7 @@ using osu.Framework.Localisation;
 using osuTK.Graphics;
 using Vector2 = osuTK.Vector2;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Backdrops;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays.Settings.Entries;
@@ -153,7 +155,7 @@ namespace osu.Game.Overlays.Settings.Rendering
 
         public ISettingsSectionFrame CreateSectionFrame(LocalisableString header, Drawable content) => new SectionFrame(header, content);
 
-        public Drawable CreatePanelBackground() => new ColourProviderBox(c => c.Background4)
+        public Drawable CreatePanelBackground() => new GlassPanelBackground
         {
             Anchor = Anchor.TopRight,
             Origin = Anchor.TopRight,
@@ -163,7 +165,7 @@ namespace osu.Game.Overlays.Settings.Rendering
 
         public Drawable CreatePanelHeader(LocalisableString title, LocalisableString description) => new SettingsHeader(title, description);
 
-        public Drawable CreatePinnedHeaderBackground() => new ColourProviderBox(c => c.Background5)
+        public Drawable CreatePinnedHeaderBackground() => new ColourProviderBox(c => c.Background5.Opacity(ThemeAware.GlassAlpha(0.85f)))
         {
             RelativeSizeAxes = Axes.Both,
         };
@@ -245,6 +247,39 @@ namespace osu.Game.Overlays.Settings.Rendering
 
             protected override LocalisableString GenerateItemText(T item)
                 => entry.ItemLabel != null ? entry.ItemLabel(item) : base.GenerateItemText(item);
+        }
+
+        /// <summary>
+        /// Torii Dark Glass panel backdrop for modern settings, tracking live custom UI hue changes.
+        /// </summary>
+        private partial class GlassPanelBackground : GlassBackdrop
+        {
+            private OverlayColourProvider? colourProvider;
+
+            [BackgroundDependencyLoader]
+            private void load(OverlayColourProvider colourProvider)
+            {
+                this.colourProvider = colourProvider;
+                colourProvider.ColoursChanged += updateTint;
+                updateTint();
+            }
+
+            private void updateTint()
+            {
+                if (colourProvider != null)
+                    TintColour = colourProvider.Background4.Opacity(ThemeAware.GlassAlpha(0.8f));
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                if (isDisposing && colourProvider != null)
+                {
+                    colourProvider.ColoursChanged -= updateTint;
+                    colourProvider = null;
+                }
+
+                base.Dispose(isDisposing);
+            }
         }
 
         /// <summary>

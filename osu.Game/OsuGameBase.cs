@@ -88,6 +88,16 @@ namespace osu.Game
         public const string OSU_PROTOCOL = "torii://";
 
         /// <summary>
+        /// Returns true if <paramref name="value"/> starts with a supported Torii/osu deep-link URI scheme.
+        /// </summary>
+        public static bool IsSupportedProtocolLink(string? value)
+            => !string.IsNullOrEmpty(value)
+               && (value.StartsWith("torii://", StringComparison.OrdinalIgnoreCase)
+                   || value.StartsWith("toriimp://", StringComparison.OrdinalIgnoreCase)
+                   || value.StartsWith("osu://", StringComparison.OrdinalIgnoreCase)
+                   || value.StartsWith("osump://", StringComparison.OrdinalIgnoreCase));
+
+        /// <summary>
         /// The filename of the main client database.
         /// </summary>
         public const string CLIENT_DATABASE_FILENAME = @"client.realm";

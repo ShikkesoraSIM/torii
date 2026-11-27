@@ -59,10 +59,10 @@ namespace osu.Game.Overlays.Settings
                 });
             }
 
-            colourProvider.ColoursChanged += updateTheme;
+            colourProvider.ColoursChanged += UpdateTheme;
         }
 
-        private void updateTheme()
+        protected virtual void UpdateTheme()
         {
             if (background != null)
                 background.Colour = colourProvider.Background5;
@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.Settings
         protected override void Dispose(bool isDisposing)
         {
             if (isDisposing && colourProvider != null)
-                colourProvider.ColoursChanged -= updateTheme;
+                colourProvider.ColoursChanged -= UpdateTheme;
 
             base.Dispose(isDisposing);
         }

@@ -19,15 +19,15 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
         private Bindable<bool> legacyResults = null!;
         private Bindable<bool> v2Results = null!;
         private Bindable<UIThemeOption> theme = null!;
+        private NoteEntry classicNote = null!;
         private readonly Bindable<ResultsScreenStyle> style = new Bindable<ResultsScreenStyle>();
         private bool syncingStyle;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            // Retain the existing configuration keys so older preferences require no migration.
             theme = config.GetBindable<UIThemeOption>(OsuSetting.UITheme);
-            legacyResults = config.GetBindable<bool>(theme.Value == UIThemeOption.StableUI ? OsuSetting.ToriiStableUIResults : OsuSetting.ToriiStableResults);
+            legacyResults = config.GetBindable<bool>(OsuSetting.ToriiStableUIResults);
             v2Results = config.GetBindable<bool>(OsuSetting.UseV2ResultsScreen);
 
             Children = new Drawable[]
@@ -39,15 +39,14 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                     Current = style,
                     Keywords = new[] { @"results", @"ranking", @"score", @"modern", @"legacy", @"classic", @"layout", @"skin" },
                 }),
+                CreateItem(classicNote = new NoteEntry
+                {
+                    AttachedToPrevious = true,
+                }),
             };
 
             legacyResults.BindValueChanged(_ => syncStyle(), true);
-            theme.BindValueChanged(_ =>
-            {
-                legacyResults.UnbindAll();
-                legacyResults = config.GetBindable<bool>(theme.Value == UIThemeOption.StableUI ? OsuSetting.ToriiStableUIResults : OsuSetting.ToriiStableResults);
-                legacyResults.BindValueChanged(_ => syncStyle(), true);
-            });
+            theme.BindValueChanged(_ => syncStyle());
             v2Results.BindValueChanged(_ => syncStyle());
             style.BindValueChanged(e =>
             {
@@ -58,6 +57,7 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 legacyResults.Value = e.NewValue == ResultsScreenStyle.Legacy;
                 v2Results.Value = e.NewValue == ResultsScreenStyle.V2;
                 syncingStyle = false;
+                updateClassicNote();
             });
         }
 
@@ -67,9 +67,18 @@ namespace osu.Game.Overlays.Settings.Sections.UserInterface
                 return;
 
             syncingStyle = true;
-            // Match the results screen's existing precedence when both old flags are enabled.
-            style.Value = legacyResults.Value ? ResultsScreenStyle.Legacy : v2Results.Value ? ResultsScreenStyle.V2 : ResultsScreenStyle.Default;
+            // Only show Legacy as active when Torii Classic theme is selected and Classic results are enabled.
+            bool classicActive = theme.Value == UIThemeOption.StableUI && legacyResults.Value;
+            style.Value = classicActive ? ResultsScreenStyle.Legacy : v2Results.Value ? ResultsScreenStyle.V2 : ResultsScreenStyle.Default;
             syncingStyle = false;
+            updateClassicNote();
+        }
+
+        private void updateClassicNote()
+        {
+            classicNote.Note.Value = style.Value == ResultsScreenStyle.Legacy && theme.Value != UIThemeOption.StableUI
+                ? new SettingsNote.Data("Classic results require the Torii Classic theme. Enable Torii Classic under Torii > Torii Classic and restart.", SettingsNote.Type.Informational)
+                : null;
         }
     }
 }
