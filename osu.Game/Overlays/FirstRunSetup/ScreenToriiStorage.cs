@@ -4,18 +4,20 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterfaceV2;
-using osu.Game.IO;
 using osu.Game.Localisation;
+using osu.Game.Overlays.Settings;
+using osu.Game.Torii.OpenFolders;
 using osuTK;
 using FontAwesome = osu.Framework.Graphics.Sprites.FontAwesome;
 
@@ -47,7 +49,11 @@ namespace osu.Game.Overlays.FirstRunSetup
         [Resolved(canBeNull: true)]
         private FirstRunSetupOverlay? firstRunOverlay { get; set; }
 
-        private OsuTextFlowContainer helperText = null!;
+        [Resolved(canBeNull: true)]
+        private OpenFoldersStore? openFolders { get; set; }
+
+        private Bindable<bool>? openFoldersSkins;
+        private Bindable<bool>? openFoldersSongs;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -88,6 +94,7 @@ namespace osu.Game.Overlays.FirstRunSetup
                     Spacing = new Vector2(12),
                     ChildrenEnumerable = intro,
                 },
+                createNotice(ToriiOpenFoldersStrings.FirstRunStartFreshNotice),
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -100,29 +107,91 @@ namespace osu.Game.Overlays.FirstRunSetup
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = 55,
-                            Text = ToriiSettingsStrings.ChooseLazerFolderManually,
-                            Action = showFolderPicker,
+                            Text = ToriiOpenFoldersStrings.FirstRunStartFreshRecommendedButton,
+                            Action = stayFresh,
                         },
                         new RoundedButton
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = 55,
-                            Text = ToriiSettingsStrings.KeepPortable,
-                            Action = stayFresh,
+                            Height = 50,
+                            BackgroundColour = OverlayColourProvider.Background3,
+                            Text = ToriiSettingsStrings.ChooseLazerFolderManually,
+                            Action = showFolderPicker,
                         },
                     }
                 },
             };
 
-            content.Add(helperText = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 13))
+            if (OpenFoldersStore.IsSupportedOnCurrentPlatform)
             {
-                Text = ToriiSettingsStrings.ChangeLaterInSettings,
+                openFoldersSkins = config.GetBindable<bool>(OsuSetting.ToriiOpenFoldersSkins);
+                openFoldersSongs = config.GetBindable<bool>(OsuSetting.ToriiOpenFoldersSongs);
+
+                openFoldersSkins.BindValueChanged(e =>
+                {
+                    if (e.NewValue)
+                        openFolders?.EnsureRootDirectories();
+                });
+
+                openFoldersSongs.BindValueChanged(e =>
+                {
+                    if (e.NewValue)
+                        openFolders?.EnsureRootDirectories();
+                });
+
+                content.Add(new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(10),
+                    Margin = new MarginPadding { Top = 6 },
+                    Children = new Drawable[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Text = ToriiOpenFoldersStrings.FirstRunOpenFoldersHeader,
+                            Font = OsuFont.TorusAlternate.With(size: 18),
+                            Colour = OverlayColourProvider.Light1,
+                        },
+                        createNotice(ToriiOpenFoldersStrings.FirstRunOpenFoldersNotice),
+                        new FormCheckBox
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Caption = ToriiOpenFoldersStrings.StoreNewSkinsCaption,
+                            HintText = ToriiOpenFoldersStrings.StoreNewSkinsHint,
+                            Current = openFoldersSkins,
+                        },
+                        new FormCheckBox
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Caption = ToriiOpenFoldersStrings.StoreNewSongsCaption,
+                            HintText = ToriiOpenFoldersStrings.StoreNewSongsHint,
+                            Current = openFoldersSongs,
+                        },
+                    }
+                });
+            }
+
+            content.Add(new Container
+            {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Colour = OverlayColourProvider.Content2,
+                Margin = new MarginPadding { Bottom = 20 },
+                Child = createNotice(ToriiSettingsStrings.ChangeLaterInSettings),
             });
 
             Content.AddRange(content);
+        }
+
+        private static SettingsNote createNotice(LocalisableString text, SettingsNote.Type type = SettingsNote.Type.Informational)
+        {
+            return new SettingsNote
+            {
+                RelativeSizeAxes = Axes.X,
+                Margin = new MarginPadding { Top = -SettingsSection.ITEM_SPACING_V2 },
+                Current = { Value = new SettingsNote.Data(text, type) },
+            };
         }
 
         private void showFolderPicker()

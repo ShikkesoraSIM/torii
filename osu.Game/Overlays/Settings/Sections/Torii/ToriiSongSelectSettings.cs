@@ -9,8 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Settings.Entries;
 
@@ -24,7 +22,7 @@ namespace osu.Game.Overlays.Settings.Sections.Torii
         private readonly Dictionary<OsuSetting, Bindable<bool>> persisted = new Dictionary<OsuSetting, Bindable<bool>>();
         private Bindable<UIThemeOption> theme = null!;
         private SettingsButtonV2 applyButton = null!;
-        private OsuTextFlowContainer hint = null!;
+        private NoteEntry hintNote = null!;
         private OsuConfigManager config = null!;
         private bool requirementShown;
 
@@ -49,12 +47,10 @@ namespace osu.Game.Overlays.Settings.Sections.Torii
                 checkbox(OsuSetting.ToriiStableUIMods, "Classic Mod Select Screen"),
                 checkbox(OsuSetting.ToriiStableUIFooter, "Classic Footer & Buttons"),
                 checkbox(OsuSetting.ToriiStableUIFonts, "Classic Fonts"),
-                hint = new OsuTextFlowContainer(t => t.Font = OsuFont.Style.Caption1)
+                CreateItem(hintNote = new NoteEntry
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = SettingsPanel.CONTENT_PADDING,
-                },
+                    AttachedToPrevious = true,
+                }),
                 applyButton = new SettingsButtonV2
                 {
                     Text = "Apply Changes to Theme",
@@ -101,9 +97,11 @@ namespace osu.Game.Overlays.Settings.Sections.Torii
             bool needsTheme = config.Get<UIThemeOption>(OsuSetting.UITheme) != UIThemeOption.StableUI;
             applyButton.Enabled.Value = hasPendingChanges || needsTheme;
             applyButton.Text = needsTheme ? "Enable Torii Classic" : "Apply Changes to Theme";
-            hint.Text = needsTheme
-                ? "These options require Torii Classic. Choose your components, then enable the theme below and restart."
-                : "Changes take effect after restarting the game.";
+            hintNote.Note.Value = new SettingsNote.Data(
+                needsTheme
+                    ? "These options require Torii Classic. Choose your components, then enable the theme below and restart."
+                    : "Changes take effect after restarting the game.",
+                SettingsNote.Type.Informational);
         }
 
         private void apply()

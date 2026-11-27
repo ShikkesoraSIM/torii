@@ -8,8 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Game.Configuration;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Dialog;
 using osu.Game.Overlays.Notifications;
@@ -51,11 +49,11 @@ namespace osu.Game.Overlays.Settings.Sections.Torii
 
             if (!OpenFoldersStore.IsSupportedOnCurrentPlatform)
             {
-                Add(createDescription(ToriiOpenFoldersStrings.DesktopOnlyNotice));
+                Add(createNotice(ToriiOpenFoldersStrings.DesktopOnlyNotice));
                 return;
             }
 
-            Add(createDescription(ToriiOpenFoldersStrings.SectionDescription));
+            Add(createNotice(ToriiOpenFoldersStrings.SectionDescription));
 
             if (config != null)
             {
@@ -127,17 +125,16 @@ namespace osu.Game.Overlays.Settings.Sections.Torii
             });
         }
 
-        private static OsuTextFlowContainer createDescription(LocalisableString text)
+        private Drawable createNotice(LocalisableString text, SettingsNote.Type type = SettingsNote.Type.Informational)
         {
-            var description = new OsuTextFlowContainer(t => t.Font = OsuFont.Style.Caption1)
+            return CreateItem(new NoteEntry
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Padding = SettingsPanel.CONTENT_PADDING,
-            };
-
-            description.AddText(text);
-            return description;
+                AttachedToPrevious = true,
+                Note =
+                {
+                    Value = new SettingsNote.Data(text, type),
+                },
+            });
         }
 
         private void openSkinsFolder()

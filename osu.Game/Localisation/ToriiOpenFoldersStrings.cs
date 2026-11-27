@@ -55,5 +55,13 @@ namespace osu.Game.Localisation
         public static LocalisableString DesktopOnlyNotice => "Open Folders is available on desktop platforms only.";
 
         public static LocalisableString LocallyModifiedBeatmapNotice => "This beatmap was modified in the Songs/ folder, so this play will be saved locally only.";
+
+        public static LocalisableString FirstRunStartFreshRecommendedButton => "Start fresh (Recommended)";
+
+        public static LocalisableString FirstRunStartFreshNotice => "Recommended: Start fresh to give Torii its own clean data folder without interfering with another installation. You can still import beatmaps, skins, and scores during setup or later in Settings.";
+
+        public static LocalisableString FirstRunOpenFoldersHeader => "Recommended: Open Folders";
+
+        public static LocalisableString FirstRunOpenFoldersNotice => "Normally, skins and beatmaps are stored inside hashed internal storage. We recommend enabling Open Folders below so newly imported skins and beatmaps are saved in regular Skins/ and Songs/ folders instead. This lets you browse files in your file manager, edit skin images, audio, and skin.ini with live reload, and drop new beatmaps directly into Songs/ without restarting.";
     }
 }

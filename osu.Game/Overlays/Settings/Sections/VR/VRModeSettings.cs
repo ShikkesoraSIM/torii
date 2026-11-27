@@ -5,8 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Localisation;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
+using osu.Game.Overlays.Settings.Entries;
 using osu.Game.VR;
 
 namespace osu.Game.Overlays.Settings.Sections.VR
@@ -28,12 +27,12 @@ namespace osu.Game.Overlays.Settings.Sections.VR
 
         private IBindable<bool> available = null!;
         private SettingsButtonV2 enableButton = null!;
-        private OsuTextFlowContainer notice = null!;
+        private NoteEntry notice = null!;
 
         private double lastRefresh = double.MinValue;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             if (vrMode.Enabled)
             {
@@ -46,7 +45,14 @@ namespace osu.Game.Overlays.Settings.Sections.VR
                         Keywords = new[] { "vr", "steamvr", "desktop", "exit", "leave" },
                         Action = vrMode.Disable,
                     },
-                    createText("Closing SteamVR leaves VR mode too."),
+                    CreateItem(new NoteEntry
+                    {
+                        AttachedToPrevious = true,
+                        Note =
+                        {
+                            Value = new SettingsNote.Data("Closing SteamVR leaves VR mode too.", SettingsNote.Type.Informational),
+                        },
+                    }),
                 };
 
                 return;
@@ -61,10 +67,11 @@ namespace osu.Game.Overlays.Settings.Sections.VR
                     Keywords = new[] { "vr", "steamvr", "headset" },
                     Action = vrMode.Enable,
                 },
-                notice = createText("Start SteamVR to be able to enable VR mode."),
+                CreateItem(notice = new NoteEntry
+                {
+                    AttachedToPrevious = true,
+                }),
             };
-
-            notice.Colour = colours.Yellow;
         }
 
         protected override void LoadComplete()
@@ -78,7 +85,9 @@ namespace osu.Game.Overlays.Settings.Sections.VR
             available.BindValueChanged(a =>
             {
                 enableButton.CanBeShown.Value = a.NewValue;
-                notice.Alpha = a.NewValue ? 0 : 1;
+                notice.Note.Value = a.NewValue
+                    ? null
+                    : new SettingsNote.Data("Start SteamVR to be able to enable VR mode.", SettingsNote.Type.Warning);
             }, true);
         }
 
@@ -92,19 +101,6 @@ namespace osu.Game.Overlays.Settings.Sections.VR
                 lastRefresh = Time.Current;
                 vrMode.Refresh();
             }
-        }
-
-        private static OsuTextFlowContainer createText(string text)
-        {
-            var flow = new OsuTextFlowContainer(t => t.Font = OsuFont.Default.With(size: 14))
-            {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Padding = SettingsPanel.CONTENT_PADDING,
-            };
-
-            flow.AddText(text);
-            return flow;
         }
     }
 }

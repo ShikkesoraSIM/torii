@@ -16,6 +16,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.IO;
 using osu.Game.Localisation;
+using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Edit.Setup;
 using osuTK;
 
@@ -48,7 +49,7 @@ namespace osu.Game.Overlays.FirstRunSetup
 
         private LazerStorageLocatorTextBox storageTextBox = null!;
 
-        private OsuTextFlowContainer helperText = null!;
+        private SettingsNote helperNote = null!;
 
         public override LocalisableString? NextStepText => ToriiSettingsStrings.SkipFirstRunSetup;
 
@@ -95,12 +96,11 @@ namespace osu.Game.Overlays.FirstRunSetup
                         TextAnchor = Anchor.TopCentre,
                     },
                 },
-                helperText = new OsuTextFlowContainer(cp => cp.Font = OsuFont.Default.With(size: 13))
+                helperNote = new SettingsNote
                 {
-                    Text = ToriiSettingsStrings.ChangeLaterInSettings,
                     RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Colour = OverlayColourProvider.Content2,
+                    Margin = new MarginPadding { Top = -SettingsSection.ITEM_SPACING_V2 },
+                    Current = { Value = new SettingsNote.Data(ToriiSettingsStrings.ChangeLaterInSettings, SettingsNote.Type.Informational) },
                 },
             };
         }
@@ -110,8 +110,7 @@ namespace osu.Game.Overlays.FirstRunSetup
             if (ToriiFirstRunFlow.ApplyDataPath(storageTextBox.Current.Value, storage, game, config, dialogOverlay))
                 return;
 
-            helperText.Text = ToriiSettingsStrings.InvalidLazerFolder;
-            helperText.Colour = colours.Orange1;
+            helperNote.Current.Value = new SettingsNote.Data(ToriiSettingsStrings.InvalidLazerFolder, SettingsNote.Type.Warning);
         }
 
         private void stayFresh()
