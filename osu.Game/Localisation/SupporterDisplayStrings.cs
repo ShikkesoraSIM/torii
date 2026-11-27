@@ -15,7 +15,7 @@ namespace osu.Game.Localisation
         public static LocalisableString ThankYouForSupporting => new TranslatableString(getKey(@"thank_you_for_supporting"), @"Eternal thanks to you for supporting Torii!");
 
         /// <summary>
-        /// "Consider becoming a [Torii Supporter]({0}) to help support Torii's development"
+        /// "Consider becoming a [Torii Supporter]({0}) to help support Torii&#39;s development"
         /// </summary>
         public static LocalisableString ConsiderBecomingASupporter(string url) => new TranslatableString(getKey(@"consider_becoming_a_supporter"), @"Consider becoming a [Torii Supporter]({0}) to help support Torii's development", url);
 
