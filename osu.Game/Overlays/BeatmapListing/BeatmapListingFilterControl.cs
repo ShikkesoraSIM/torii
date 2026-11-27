@@ -389,8 +389,6 @@ namespace osu.Game.Overlays.BeatmapListing
                     }
 
                     // Convert BeatmapSetInfo → APIBeatmapSet inside realm.Run
-                    string webBase = (api?.Endpoints.WebsiteUrl ?? "https://lazer.shikkesora.com").TrimEnd('/');
-
                     return sets.Select(s =>
                     {
                         var first = s.Beatmaps.FirstOrDefault();
@@ -409,12 +407,12 @@ namespace osu.Game.Overlays.BeatmapListing
                             BPM = first?.BPM ?? 0,
                             Covers = new BeatmapSetOnlineCovers
                             {
-                                CoverLowRes = $"{webBase}/beatmaps/{s.OnlineID}/covers/cover.jpg",
-                                Cover = $"{webBase}/beatmaps/{s.OnlineID}/covers/cover@2x.jpg",
-                                CardLowRes = $"{webBase}/beatmaps/{s.OnlineID}/covers/card.jpg",
-                                Card = $"{webBase}/beatmaps/{s.OnlineID}/covers/card@2x.jpg",
-                                ListLowRes = $"{webBase}/beatmaps/{s.OnlineID}/covers/list.jpg",
-                                List = $"{webBase}/beatmaps/{s.OnlineID}/covers/list@2x.jpg",
+                                CoverLowRes = $"https://lazer-api.shikkesora.com/api/v2/beatmapsets/{s.OnlineID}/covers/cover.jpg",
+                                Cover = $"https://lazer-api.shikkesora.com/api/v2/beatmapsets/{s.OnlineID}/covers/cover@2x.jpg",
+                                CardLowRes = $"https://lazer-api.shikkesora.com/api/v2/beatmapsets/{s.OnlineID}/covers/card.jpg",
+                                Card = $"https://lazer-api.shikkesora.com/api/v2/beatmapsets/{s.OnlineID}/covers/card@2x.jpg",
+                                ListLowRes = $"https://lazer-api.shikkesora.com/api/v2/beatmapsets/{s.OnlineID}/covers/list.jpg",
+                                List = $"https://lazer-api.shikkesora.com/api/v2/beatmapsets/{s.OnlineID}/covers/list@2x.jpg",
                             },
                             Beatmaps = s.Beatmaps.Select(b => new APIBeatmap
                             {

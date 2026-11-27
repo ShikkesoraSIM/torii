@@ -41,7 +41,7 @@ namespace osu.Desktop.Windows
 
         private const string program_id_protocol_prefix = "Torii.Uri";
 
-        private static readonly ApplicationCapability application_capability = new ApplicationCapability(@"torii", @"Software\Shikkesora\Torii\Capabilities", "Torii");
+        private static readonly ApplicationCapability application_capability = new ApplicationCapability(@"Torii", @"Software\Torii\Torii\Capabilities", "Torii");
 
         private static readonly FileAssociation[] file_associations =
         {

@@ -7,8 +7,7 @@ namespace osu.Game.Online
     {
         public DevelopmentEndpointConfiguration()
         {
-            WebsiteUrl = @"https://lazer.shikkesora.com";
-            APIUrl = @"https://lazer-api.shikkesora.com";
+            WebsiteUrl = APIUrl = @"https://lazer-api.shikkesora.com";
             APIClientSecret = @"3LP2mhUrV89xxzD1YKNndXHEhWWCRLPNKioZ9ymT";
             APIClientID = "5";
             SpectatorUrl = $@"{APIUrl}/signalr/spectator";

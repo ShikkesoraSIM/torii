@@ -405,11 +405,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.Queue
             experimentalText.AddIcon(FontAwesome.Solid.Lightbulb);
             experimentalText.AddText(@" ");
             experimentalText.AddText("This system is under continuous and rapid development.\n", sp => sp.Font = sp.Font.With(weight: FontWeight.SemiBold));
-            experimentalText.AddText("Follow the ");
-            experimentalText.AddLink("changelog", @"https://lazer.shikkesora.com/wiki", sp => sp.Font = sp.Font.With(weight: FontWeight.SemiBold));
-            experimentalText.AddText(" and provide any ");
-            experimentalText.AddLink("feedback", @"https://lazer.shikkesora.com/wiki", sp => sp.Font = sp.Font.With(weight: FontWeight.SemiBold));
-            experimentalText.AddText(" on the Torii wiki!");
+            experimentalText.AddText("Follow updates and share feedback in the Torii community!");
         }
 
         protected override void LoadComplete()

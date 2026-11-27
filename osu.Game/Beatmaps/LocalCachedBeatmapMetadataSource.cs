@@ -180,8 +180,7 @@ namespace osu.Game.Beatmaps
             string cacheFilePath = storage.GetFullPath(cache_database_name);
             string compressedCacheFilePath = $@"{cacheFilePath}.bz2";
 
-            string toriiWebUrl = Environment.GetEnvironmentVariable("TORII_WEB_URL")?.TrimEnd('/') ?? "https://lazer.shikkesora.com";
-            cacheDownloadRequest = new FileWebRequest(compressedCacheFilePath, toriiWebUrl + $"/client-resources/{cache_database_name}.bz2?{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}");
+            cacheDownloadRequest = new FileWebRequest(compressedCacheFilePath, $@"https://lazer-api.shikkesora.com/client-resources/{cache_database_name}.bz2?{DateTimeOffset.UtcNow:yyyyMMdd}");
 
             cacheDownloadRequest.Failed += ex =>
             {

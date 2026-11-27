@@ -7,14 +7,13 @@ namespace osu.Game.Online
     {
         public ProductionEndpointConfiguration()
         {
-            WebsiteUrl = @"https://lazer.shikkesora.com";
-            APIUrl = @"https://lazer-api.shikkesora.com";
+            WebsiteUrl = APIUrl = @"https://lazer.shikkesora.com";
             APIClientSecret = @"FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk";
             APIClientID = "5";
-            SpectatorUrl = $@"{APIUrl}/signalr/spectator";
-            MultiplayerUrl = $@"{APIUrl}/signalr/multiplayer";
-            MetadataUrl = $@"{APIUrl}/signalr/metadata";
-            BeatmapSubmissionServiceUrl = $@"{APIUrl}/beatmap-submission";
+            SpectatorUrl = "https://lazer-api.shikkesora.com/spectator";
+            MultiplayerUrl = "https://lazer-api.shikkesora.com/multiplayer";
+            MetadataUrl = "https://lazer-api.shikkesora.com/metadata";
+            BeatmapSubmissionServiceUrl = "https://lazer-api.shikkesora.com";
         }
     }
 }

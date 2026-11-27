@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
 using osu.Framework.Localisation;
 using osu.Game.Online.API;
@@ -91,16 +90,14 @@ namespace osu.Game.Beatmaps
         }
 
         /// <summary>
-        /// Get the official osu! (osu.ppy.sh) beatmap difficulty page URL, or <c>null</c> if unavailable.
-        /// Torii OnlineIDs mirror the real osu! ids, so this resolves on the official site.
+        /// Get the official Torii beatmap difficulty page URL, or <c>null</c> if unavailable.
         /// </summary>
         public static string? GetOfficialOnlineURL(this IBeatmapInfo beatmapInfo, IRulesetInfo? ruleset = null)
         {
             if (beatmapInfo.OnlineID <= 0 || beatmapInfo.BeatmapSet == null)
                 return null;
 
-            string webUrl = Environment.GetEnvironmentVariable("TORII_WEB_URL")?.TrimEnd('/') ?? "https://lazer.shikkesora.com";
-            return $@"{webUrl}/beatmapsets/{beatmapInfo.BeatmapSet.OnlineID}#{ruleset?.ShortName ?? beatmapInfo.Ruleset.ShortName}/{beatmapInfo.OnlineID}";
+            return $@"https://lazer.shikkesora.com/beatmapsets/{beatmapInfo.BeatmapSet.OnlineID}#{ruleset?.ShortName ?? beatmapInfo.Ruleset.ShortName}/{beatmapInfo.OnlineID}";
         }
     }
 }

@@ -13,7 +13,7 @@ namespace osu.Game.Graphics.Containers.Markdown
         public LocalisableString TooltipText { get; }
 
         public OsuMarkdownImage(LinkInline linkInline)
-            : base(linkInline.Url ?? string.Empty)
+            : base($"https://lazer.shikkesora.com/media-url?url={linkInline.Url}")
         {
             TooltipText = linkInline.Title;
         }

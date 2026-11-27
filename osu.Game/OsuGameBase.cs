@@ -83,7 +83,7 @@ namespace osu.Game
         public const string GAME_NAME = "Torii Nova";
 #endif
 
-        public const string OSU_PROTOCOL = "osu://";
+        public const string OSU_PROTOCOL = "torii://";
 
         /// <summary>
         /// The filename of the main client database.
@@ -138,7 +138,7 @@ namespace osu.Game
                     return informationalVersion.Split('+').First();
 
                 Version version = AssemblyVersion;
-                return $@"{version.Major}.{version.Minor}.{version.Build}-lazer";
+                return $@"{version.Major}.{version.Minor}.{version.Build}-torii";
             }
         }
 
@@ -790,7 +790,7 @@ namespace osu.Game
                     textWriter.WriteLine(@"Importantly, it is NOT the only directory you need a backup of to avoid losing data. If you copy only the ""files/"" directory, YOU WILL LOSE DATA.");
                     textWriter.WriteLine();
                     textWriter.WriteLine(@"For more information on how these files are organised,");
-                    textWriter.WriteLine(@"see https://github.com/ppy/osu/wiki/User-file-storage");
+                    textWriter.WriteLine(@"see https://lazer.shikkesora.com");
                 }
             }
         }
