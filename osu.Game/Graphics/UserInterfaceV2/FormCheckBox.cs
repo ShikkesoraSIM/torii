@@ -109,6 +109,8 @@ namespace osu.Game.Graphics.UserInterfaceV2
         {
             base.LoadComplete();
 
+            colourProvider.ColoursChanged += updateState;
+
             current.BindValueChanged(_ =>
             {
                 updateState();
@@ -117,6 +119,14 @@ namespace osu.Game.Graphics.UserInterfaceV2
                 ValueChanged?.Invoke();
             });
             current.BindDisabledChanged(_ => updateState(), true);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            if (isDisposing)
+                colourProvider.ColoursChanged -= updateState;
+
+            base.Dispose(isDisposing);
         }
 
         protected override bool OnHover(HoverEvent e)
