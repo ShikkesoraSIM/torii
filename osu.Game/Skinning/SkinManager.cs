@@ -22,9 +22,12 @@ using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Framework.Utils;
 using osu.Game.Audio;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.IO;
+using osu.Game.Localisation;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Torii.OpenFolders;
 using osu.Game.Utils;
 
 namespace osu.Game.Skinning
@@ -36,7 +39,7 @@ namespace osu.Game.Skinning
     /// This is also exposed and cached as <see cref="ISkinSource"/> to allow for any component to potentially have skinning support.
     /// For gameplay components, see <see cref="RulesetSkinProvidingContainer"/> which adds extra legacy and toggle logic that may affect the lookup process.
     /// </remarks>
-    public class SkinManager : ModelManager<SkinInfo>, ISkinSource, IStorageResourceProvider, IModelImporter<SkinInfo>
+    public class SkinManager : ModelManager<SkinInfo>, ISkinSource, IStorageResourceProvider, IModelImporter<SkinInfo>, IOpenFolderSkinProvider
     {
         /// <summary>
         /// The default "classic" skin.
@@ -64,6 +67,11 @@ namespace osu.Game.Skinning
 
         private readonly IResourceStore<byte[]> userFiles;
 
+        private readonly OpenFoldersStore openFolders;
+        private readonly OpenFoldersMigrator openFoldersMigrator;
+
+        public OpenFoldersStore OpenFolders => openFolders;
+
         private Skin argonSkin { get; }
 
         private Skin trianglesSkin { get; }
@@ -85,19 +93,22 @@ namespace osu.Game.Skinning
             }
         }
 
-        public SkinManager(Storage storage, RealmAccess realm, GameHost host, IResourceStore<byte[]> resources, AudioManager audio, Scheduler scheduler)
+        public SkinManager(Storage storage, RealmAccess realm, GameHost host, IResourceStore<byte[]> resources, AudioManager audio, Scheduler scheduler,
+                           OpenFoldersStore openFolders = null, OpenFoldersMigrator openFoldersMigrator = null, OsuConfigManager config = null)
             : base(storage, realm)
         {
             this.audio = audio;
             this.scheduler = scheduler;
             this.host = host;
             this.resources = resources;
+            this.openFolders = openFolders;
+            this.openFoldersMigrator = openFoldersMigrator;
 
             userFiles = new StorageBackedResourceStore(storage.GetStorageForDirectory("files"));
 
             PinnedSkins = new PinnedSkinsStore(storage);
 
-            skinImporter = new SkinImporter(storage, realm, this)
+            skinImporter = new SkinImporter(storage, realm, this, openFolders, openFoldersMigrator, config)
             {
                 PostNotification = obj => PostNotification?.Invoke(obj),
             };
@@ -472,6 +483,105 @@ namespace osu.Game.Skinning
             }
 
             CurrentSkinInfo.Value = skinInfo ?? trianglesSkin.SkinInfo;
+        }
+
+        /// <summary>
+        /// Torii: reloads the currently active skin from disk (live hot-reload for open Skins/ folders).
+        /// </summary>
+        public bool ReloadCurrentSkin(bool audioOnly = false, bool notify = false)
+        {
+            var currentInfo = CurrentSkinInfo.Value;
+            if (currentInfo == null)
+                return false;
+
+            if (audioOnly && CurrentSkin.Value != null)
+            {
+                CurrentSkin.Value.RecycleSamples();
+                SourceChanged?.Invoke();
+
+                if (notify)
+                {
+                    string name = currentInfo.PerformRead(s => s.Name);
+                    PostNotification?.Invoke(new SimpleNotification
+                    {
+                        Text = ToriiOpenFoldersStrings.SkinReloaded(name),
+                    });
+                }
+
+                return true;
+            }
+
+            var oldSkin = CurrentSkin.Value;
+            var freshSkin = currentInfo.PerformRead(GetSkin);
+            CurrentSkin.Value = freshSkin;
+
+            // Safely dispose old user skin after a brief grace window so in-flight drawables release textures cleanly.
+            // Never dispose built-in/protected skins (Argon, ArgonPro, Triangles, Classic).
+            bool oldIsProtected = oldSkin?.SkinInfo.PerformRead(s => s.Protected) ?? true;
+            if (oldSkin != null
+                && !oldIsProtected
+                && !ReferenceEquals(oldSkin, freshSkin)
+                && !ReferenceEquals(oldSkin, DefaultClassicSkin)
+                && !ReferenceEquals(oldSkin, trianglesSkin)
+                && !ReferenceEquals(oldSkin, argonSkin))
+            {
+                scheduler.AddDelayed(() =>
+                {
+                    try { oldSkin.Dispose(); }
+                    catch { }
+                }, 500);
+            }
+
+            if (notify)
+            {
+                string name = currentInfo.PerformRead(s => s.Name);
+                PostNotification?.Invoke(new SimpleNotification
+                {
+                    Text = ToriiOpenFoldersStrings.SkinReloaded(name),
+                });
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Torii: opens the currently selected skin's folder in the OS file manager.
+        /// If the custom skin is still only in hashed storage, automatically unpacks it to Skins/ first.
+        /// </summary>
+        public bool OpenCurrentSkinFolder(Action<Notification> postNotification = null)
+        {
+            var notify = postNotification ?? PostNotification;
+
+            if (!OpenFoldersStore.IsSupportedOnCurrentPlatform || openFolders == null)
+            {
+                notify?.Invoke(new SimpleNotification { Text = ToriiOpenFoldersStrings.DesktopOnlyNotice });
+                return false;
+            }
+
+            var currentInfo = CurrentSkinInfo.Value;
+            if (currentInfo == null)
+                return false;
+
+            bool isProtected = currentInfo.PerformRead(s => s.Protected || s.ID == SkinInfo.RANDOM_SKIN);
+            if (isProtected)
+            {
+                notify?.Invoke(new SimpleNotification { Text = ToriiOpenFoldersStrings.BuiltInSkinNoFolder });
+                return false;
+            }
+
+            string folderPath = openFolders.GetSkinFolderPath(currentInfo.ID);
+
+            if (string.IsNullOrEmpty(folderPath) || !System.IO.Directory.Exists(folderPath))
+            {
+                folderPath = currentInfo.PerformRead(s => openFoldersMigrator?.ExtractSkinToOpenFolder(s));
+                if (!string.IsNullOrEmpty(folderPath))
+                    ReloadCurrentSkin(audioOnly: false, notify: false);
+            }
+
+            if (string.IsNullOrEmpty(folderPath))
+                return false;
+
+            return openFolders.OpenFolderInExplorer(folderPath);
         }
     }
 }

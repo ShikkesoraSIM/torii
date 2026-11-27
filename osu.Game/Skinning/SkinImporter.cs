@@ -11,11 +11,13 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
 using osu.Game.IO.Archives;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Torii.OpenFolders;
 using Realms;
 
 namespace osu.Game.Skinning
@@ -28,10 +30,18 @@ namespace osu.Game.Skinning
 
         private readonly ModelManager<SkinInfo> modelManager;
 
-        public SkinImporter(Storage storage, RealmAccess realm, IStorageResourceProvider skinResources)
+        private readonly OpenFoldersStore? openFolders;
+        private readonly OpenFoldersMigrator? openFoldersMigrator;
+        private readonly OsuConfigManager? config;
+
+        public SkinImporter(Storage storage, RealmAccess realm, IStorageResourceProvider skinResources,
+                            OpenFoldersStore? openFolders = null, OpenFoldersMigrator? openFoldersMigrator = null, OsuConfigManager? config = null)
             : base(storage, realm)
         {
             this.skinResources = skinResources;
+            this.openFolders = openFolders;
+            this.openFoldersMigrator = openFoldersMigrator;
+            this.config = config;
 
             modelManager = new ModelManager<SkinInfo>(storage, realm);
         }
@@ -126,6 +136,25 @@ namespace osu.Game.Skinning
             checkSkinIniMetadata(model, realm);
         }
 
+        protected override void PostImport(SkinInfo model, Realm realm, ImportParameters parameters)
+        {
+            base.PostImport(model, realm, parameters);
+
+            if (OpenFoldersStore.IsSupportedOnCurrentPlatform
+                && openFoldersMigrator != null
+                && config?.Get<bool>(OsuSetting.ToriiOpenFoldersSkins) == true)
+            {
+                try
+                {
+                    openFoldersMigrator.ExtractSkinToOpenFolder(model, Files);
+                }
+                catch (Exception e)
+                {
+                    LogForModel(model, "Failed to extract imported skin to Skins/ folder.", e);
+                }
+            }
+        }
+
         private void checkSkinIniMetadata(SkinInfo item, Realm realm)
         {
             var instance = createInstance(item);
@@ -189,6 +218,9 @@ namespace osu.Game.Skinning
             else
                 modelManager.ReplaceFile(existingFile, outStream, realm);
 
+            if (openFolders?.GetSkinFolderPath(item.ID) != null)
+                openFoldersMigrator?.SyncSkinFileToOpenFolder(item.ID, @"skin.ini", outStream.ToArray());
+
             // The hash is already populated at this point in import.
             // As we have changed files, it needs to be recomputed.
             item.Hash = ComputeHash(item);
@@ -211,18 +243,23 @@ namespace osu.Game.Skinning
 
                 // Serialise out the SkinInfo itself.
                 string skinInfoJson = JsonConvert.SerializeObject(s, new JsonSerializerSettings { Formatting = Formatting.Indented });
+                byte[] skinInfoBytes = Encoding.UTF8.GetBytes(skinInfoJson);
 
-                using (var streamContent = new MemoryStream(Encoding.UTF8.GetBytes(skinInfoJson)))
+                using (var streamContent = new MemoryStream(skinInfoBytes))
                 {
                     modelManager.AddFile(s, streamContent, skin_info_file, s.Realm!);
                 }
+
+                if (openFolders?.GetSkinFolderPath(s.ID) != null)
+                    openFoldersMigrator?.SyncSkinFileToOpenFolder(s.ID, skin_info_file, skinInfoBytes);
 
                 // Then serialise each of the drawable component groups into respective files.
                 foreach (var drawableInfo in skin.LayoutInfos)
                 {
                     string json = JsonConvert.SerializeObject(drawableInfo.Value, new JsonSerializerSettings { Formatting = Formatting.Indented });
+                    byte[] layoutBytes = Encoding.UTF8.GetBytes(json);
 
-                    using (var streamContent = new MemoryStream(Encoding.UTF8.GetBytes(json)))
+                    using (var streamContent = new MemoryStream(layoutBytes))
                     {
                         string filename = @$"{drawableInfo.Key}.json";
 
@@ -232,6 +269,9 @@ namespace osu.Game.Skinning
                             modelManager.ReplaceFile(oldFile, streamContent, s.Realm!);
                         else
                             modelManager.AddFile(s, streamContent, filename, s.Realm!);
+
+                        if (openFolders?.GetSkinFolderPath(s.ID) != null)
+                            openFoldersMigrator?.SyncSkinFileToOpenFolder(s.ID, filename, layoutBytes);
                     }
                 }
 

@@ -29,6 +29,7 @@ namespace osu.Game.Overlays.Settings.Sections
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
+            Add(new ToriiOpenFoldersSettings());
             Add(new ToriiSongSelectSettings());
             Add(new ToriiMenusSettings());
             Add(new ToriiGraphicsSettings());

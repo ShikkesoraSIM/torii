@@ -49,12 +49,13 @@ namespace osu.Game.Beatmaps
         private readonly ITrackStore trackStore;
         private readonly IResourceStore<byte[]> files;
         private readonly RealmAccess realm;
+        private readonly Torii.OpenFolders.OpenFoldersStore openFolders;
 
         [CanBeNull]
         private readonly GameHost host;
 
         public WorkingBeatmapCache(ITrackStore trackStore, AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> files, WorkingBeatmap defaultBeatmap = null,
-                                   GameHost host = null, RealmAccess realm = null)
+                                   GameHost host = null, RealmAccess realm = null, Torii.OpenFolders.OpenFoldersStore openFolders = null)
         {
             DefaultBeatmap = defaultBeatmap;
 
@@ -62,6 +63,7 @@ namespace osu.Game.Beatmaps
             this.resources = resources;
             this.host = host;
             this.files = files;
+            this.openFolders = openFolders;
             largeTextureStore = new LargeTextureStore(host?.Renderer ?? new DummyRenderer(), host?.CreateTextureLoaderStore(files));
             beatmapPanelTextureStore = new LargeTextureStore(host?.Renderer ?? new DummyRenderer(), new BeatmapPanelBackgroundTextureLoaderStore(host?.CreateTextureLoaderStore(files)));
             this.trackStore = trackStore;
@@ -109,7 +111,7 @@ namespace osu.Game.Beatmaps
                 // An outdated BeatmapInfo may contain a reference to a previous version of the beatmap's files on disk.
                 Debug.Assert(confirmFileHashIsUpToDate(beatmapInfo), "working beatmap returned with outdated path");
 
-                workingCache.Add(working = new BeatmapManagerWorkingBeatmap(beatmapInfo, this));
+                workingCache.Add(working = new BeatmapManagerWorkingBeatmap(beatmapInfo, this, openFolders));
 
                 // best effort; may be higher than expected.
                 GlobalStatistics.Get<int>("Beatmaps", $"Cached {nameof(WorkingBeatmap)}s").Value = workingCache.Count();
@@ -143,10 +145,14 @@ namespace osu.Game.Beatmaps
             [NotNull]
             private readonly IBeatmapResourceProvider resources;
 
-            public BeatmapManagerWorkingBeatmap(BeatmapInfo beatmapInfo, [NotNull] IBeatmapResourceProvider resources)
+            [CanBeNull]
+            private readonly Torii.OpenFolders.OpenFoldersStore openFolders;
+
+            public BeatmapManagerWorkingBeatmap(BeatmapInfo beatmapInfo, [NotNull] IBeatmapResourceProvider resources, [CanBeNull] Torii.OpenFolders.OpenFoldersStore openFolders = null)
                 : base(beatmapInfo, resources.AudioManager)
             {
                 this.resources = resources;
+                this.openFolders = openFolders;
             }
 
             protected override IBeatmap GetBeatmap()
@@ -169,18 +175,45 @@ namespace osu.Game.Beatmaps
                     string streamMD5 = stream.ComputeMD5Hash();
                     string streamSHA2 = stream.ComputeSHA2Hash();
 
-                    if (streamMD5 != BeatmapInfo.MD5Hash)
+                    bool isLocallyModifiedOpenFolder = false;
+
+                    bool hashMismatch = streamMD5 != BeatmapInfo.MD5Hash
+                                        || (!string.IsNullOrEmpty(BeatmapInfo.Hash) && streamSHA2 != BeatmapInfo.Hash);
+
+                    if (hashMismatch)
                     {
-                        Logger.Log($"Beatmap failed to load (file {BeatmapInfo.Path} does not have the expected hash).", level: LogLevel.Error);
-                        return null;
+                        if (openFolders != null && BeatmapSetInfo != null && openFolders.GetBeatmapSetFolderPath(BeatmapSetInfo.ID) != null)
+                        {
+                            isLocallyModifiedOpenFolder = true;
+                            openFolders.MarkLocallyModified(BeatmapInfo.ID, true);
+                            Logger.Log($"Beatmap {BeatmapInfo.Path} was modified in Songs/ folder; loading locally as unranked.", level: LogLevel.Important);
+                        }
+                        else
+                        {
+                            Logger.Log($"Beatmap failed to load (file {BeatmapInfo.Path} does not have the expected hash).", level: LogLevel.Error);
+                            return null;
+                        }
+                    }
+                    else
+                    {
+                        openFolders?.MarkLocallyModified(BeatmapInfo.ID, false);
                     }
 
                     using (var reader = new LineBufferedReader(stream))
                     {
                         var beatmap = Decoder.GetDecoder<Beatmap>(reader).Decode(reader);
 
-                        beatmap.BeatmapInfo.MD5Hash = streamMD5;
-                        beatmap.BeatmapInfo.Hash = streamSHA2;
+                        if (isLocallyModifiedOpenFolder)
+                        {
+                            // Keep canonical Realm MD5Hash untouched and flag locally modified so ranked submission fails closed.
+                            beatmap.BeatmapInfo.Status = BeatmapOnlineStatus.LocallyModified;
+                        }
+                        else
+                        {
+                            beatmap.BeatmapInfo.MD5Hash = streamMD5;
+                            beatmap.BeatmapInfo.Hash = streamSHA2;
+                        }
+
                         beatmap.BeatmapInfo.UpdateStatisticsFromBeatmap(beatmap);
 
                         return beatmap;

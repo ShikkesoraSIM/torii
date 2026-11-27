@@ -17,6 +17,7 @@ using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO.Archives;
@@ -28,6 +29,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
+using osu.Game.Torii.OpenFolders;
 using osu.Game.Utils;
 using Realms;
 
@@ -48,6 +50,10 @@ namespace osu.Game.Beatmaps
 
         private readonly LegacyBeatmapExporter legacyBeatmapExporter;
 
+        private readonly OpenFoldersStore? openFolders;
+        private readonly OpenFoldersMigrator? openFoldersMigrator;
+        private readonly OsuConfigManager? config;
+
         public ProcessBeatmapDelegate? ProcessBeatmap { private get; set; }
 
         public override bool PauseImports
@@ -61,9 +67,14 @@ namespace osu.Game.Beatmaps
         }
 
         public BeatmapManager(Storage storage, RealmAccess realm, IAPIProvider? api, AudioManager audioManager, IResourceStore<byte[]> gameResources, GameHost? host = null,
-                              WorkingBeatmap? defaultBeatmap = null, BeatmapDifficultyCache? difficultyCache = null, bool performOnlineLookups = false)
+                              WorkingBeatmap? defaultBeatmap = null, BeatmapDifficultyCache? difficultyCache = null, bool performOnlineLookups = false,
+                              OpenFoldersStore? openFolders = null, OpenFoldersMigrator? openFoldersMigrator = null, OsuConfigManager? config = null)
             : base(storage, realm)
         {
+            this.openFolders = openFolders;
+            this.openFoldersMigrator = openFoldersMigrator;
+            this.config = config;
+
             if (performOnlineLookups)
             {
                 if (api == null)
@@ -73,7 +84,9 @@ namespace osu.Game.Beatmaps
                     throw new ArgumentNullException(nameof(difficultyCache), "Difficulty cache must be provided if online lookups are required.");
             }
 
-            var userResources = new RealmFileStore(realm, storage).Store;
+            IResourceStore<byte[]> userResources = new RealmFileStore(realm, storage).Store;
+            if (openFolders != null && OpenFoldersStore.IsSupportedOnCurrentPlatform)
+                userResources = new OpenFolderBeatmapResourceStore(openFolders, userResources);
 
             BeatmapTrackStore = audioManager.GetTrackStore(userResources);
 
@@ -97,10 +110,10 @@ namespace osu.Game.Beatmaps
         protected virtual WorkingBeatmapCache CreateWorkingBeatmapCache(AudioManager audioManager, IResourceStore<byte[]> resources, IResourceStore<byte[]> storage, WorkingBeatmap? defaultBeatmap,
                                                                         GameHost? host)
         {
-            return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host, Realm);
+            return new WorkingBeatmapCache(BeatmapTrackStore, audioManager, resources, storage, defaultBeatmap, host, Realm, openFolders);
         }
 
-        protected virtual BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm) => new BeatmapImporter(storage, realm);
+        protected virtual BeatmapImporter CreateBeatmapImporter(Storage storage, RealmAccess realm) => new BeatmapImporter(storage, realm, openFolders, openFoldersMigrator, config);
 
         /// <summary>
         /// Create a new beatmap set, backed by a <see cref="BeatmapSetInfo"/> model,

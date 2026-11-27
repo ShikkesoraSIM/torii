@@ -57,6 +57,10 @@ namespace osu.Game.Screens.Play
         [CanBeNull]
         private INotificationOverlay notifications { get; set; }
 
+        [Resolved(canBeNull: true)]
+        [CanBeNull]
+        private Torii.OpenFolders.OpenFoldersStore openFolders { get; set; }
+
         private readonly Lock scoreSubmissionLock = new Lock();
         private TaskCompletionSource<bool> scoreSubmissionSource;
 
@@ -119,6 +123,15 @@ namespace osu.Game.Screens.Play
             if (Mods.Value.Any(m => !m.UserPlayable))
             {
                 handleTokenFailure(new InvalidOperationException("Non-user playable mod selected."));
+                return false;
+            }
+
+            if (openFolders?.IsLocallyModified(Beatmap.Value.BeatmapInfo.ID) == true
+                || Beatmap.Value.BeatmapInfo.Status == BeatmapOnlineStatus.LocallyModified)
+            {
+                handleTokenFailure(new InvalidOperationException("Beatmap was modified locally in the Songs folder."),
+                    displayNotification: true,
+                    blockedReason: ToriiOpenFoldersStrings.LocallyModifiedBeatmapNotice);
                 return false;
             }
 

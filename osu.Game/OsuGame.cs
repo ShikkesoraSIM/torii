@@ -2227,6 +2227,13 @@ namespace osu.Game
                     SkinManager.SelectPreviousSkin(LocalConfig.Get<bool>(OsuSetting.CycleSkinsThroughFavoritesOnly));
                     return true;
 
+                case GlobalAction.ReloadSkin:
+                    if (skinEditor.State.Value == Visibility.Visible)
+                        return false;
+
+                    SkinManager.ReloadCurrentSkin(audioOnly: false, notify: true);
+                    return true;
+
                 case GlobalAction.IncreaseCursorSize:
                     adjustCursorSize(0.05f);
                     return true;

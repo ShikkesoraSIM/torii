@@ -95,7 +95,19 @@ namespace osu.Game.Skinning
 
                 SkinInfo = skin.ToLive(resources.RealmAccess);
 
-                store.AddStore(new RealmBackedResourceStore<SkinInfo>(SkinInfo, resources.Files, resources.RealmAccess));
+                if (resources is Torii.OpenFolders.IOpenFolderSkinProvider openProvider
+                    && openProvider.OpenFolders?.GetSkinFolderPath(skin.ID) is string openSkinDir
+                    && Directory.Exists(openSkinDir))
+                {
+                    // Open-folder skin: authoritative directory store (zero Windows file locks).
+                    // Deliberately omits RealmBackedResourceStore so deleting a file in Skins/<Folder>/
+                    // is respected instead of silently serving a stale hashed copy.
+                    store.AddStore(new Torii.OpenFolders.UnlockedDirectoryResourceStore(openSkinDir));
+                }
+                else
+                {
+                    store.AddStore(new RealmBackedResourceStore<SkinInfo>(SkinInfo, resources.Files, resources.RealmAccess));
+                }
 
                 RecycleSamples();
                 Textures = new TextureStore(resources.Renderer, CreateTextureLoaderStore(resources, store));

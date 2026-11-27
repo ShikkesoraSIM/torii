@@ -14,6 +14,7 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Collections;
+using osu.Game.Configuration;
 using osu.Game.Database;
 using osu.Game.Extensions;
 using osu.Game.IO;
@@ -21,6 +22,7 @@ using osu.Game.IO.Archives;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Torii.OpenFolders;
 using Realms;
 
 namespace osu.Game.Beatmaps
@@ -36,9 +38,17 @@ namespace osu.Game.Beatmaps
 
         public ProcessBeatmapDelegate? ProcessBeatmap { private get; set; }
 
-        public BeatmapImporter(Storage storage, RealmAccess realm)
+        private readonly OpenFoldersStore? openFolders;
+        private readonly OpenFoldersMigrator? openFoldersMigrator;
+        private readonly OsuConfigManager? config;
+
+        public BeatmapImporter(Storage storage, RealmAccess realm,
+                               OpenFoldersStore? openFolders = null, OpenFoldersMigrator? openFoldersMigrator = null, OsuConfigManager? config = null)
             : base(storage, realm)
         {
+            this.openFolders = openFolders;
+            this.openFoldersMigrator = openFoldersMigrator;
+            this.config = config;
         }
 
         public override async Task<Live<BeatmapSetInfo>?> ImportAsUpdate(ProgressNotification notification, ImportTask importTask, BeatmapSetInfo original)
@@ -235,6 +245,20 @@ namespace osu.Game.Beatmaps
             }
 
             ProcessBeatmap?.Invoke(model, parameters.Batch ? MetadataLookupScope.LocalCacheFirst : MetadataLookupScope.OnlineFirst);
+
+            if (OpenFoldersStore.IsSupportedOnCurrentPlatform
+                && openFoldersMigrator != null
+                && config?.Get<bool>(OsuSetting.ToriiOpenFoldersSongs) == true)
+            {
+                try
+                {
+                    openFoldersMigrator.ExtractBeatmapSetToOpenFolder(model, Files);
+                }
+                catch (Exception e)
+                {
+                    LogForModel(model, "Failed to extract imported beatmap to Songs/ folder.", e);
+                }
+            }
         }
 
         private void validateOnlineIds(BeatmapSetInfo beatmapSet, Realm realm)

@@ -403,6 +403,9 @@ namespace osu.Game.Configuration
             SetDefault(OsuSetting.ToriiExclusiveAudioPeriod, ExclusiveAudioPeriod.Automatic);
             SetDefault(OsuSetting.ToriiSkipBreaksSingleConfirmation, false);
             SetDefault(OsuSetting.ToriiSkipBreaksBriefingSeen, false);
+            // Torii: Open Folders storage (readable Skins/ and Songs/ folders for new imports on desktop).
+            SetDefault(OsuSetting.ToriiOpenFoldersSkins, RuntimeInfo.IsDesktop);
+            SetDefault(OsuSetting.ToriiOpenFoldersSongs, RuntimeInfo.IsDesktop);
             // Torii VR: off on the Quest. The headset's video recorder doesn't capture the bridge's AAudio stream (recordings come
             // out silent), while BASS' own output is captured; all audio goes through the headset's low-latency mixer anyway.
             SetDefault(OsuSetting.EnableOboeAudio, !VRRuntime.IsVR);
@@ -852,6 +855,8 @@ namespace osu.Game.Configuration
         ToriiExclusiveAudioPeriod,
         ToriiSkipBreaksSingleConfirmation,
         ToriiSkipBreaksBriefingSeen,
+        ToriiOpenFoldersSkins,
+        ToriiOpenFoldersSongs,
         EnableOboeAudio,
         VRStoryboardOverlayInFront,
         VREnvironment,

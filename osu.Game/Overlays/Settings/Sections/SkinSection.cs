@@ -24,8 +24,10 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterfaceV2;
 using osu.Game.Localisation;
 using osu.Game.Overlays.Dialog;
+using osu.Game.Overlays.Notifications;
 using osu.Game.Overlays.SkinEditor;
 using osu.Game.Skinning;
+using osu.Game.Torii.OpenFolders;
 using osuTK;
 using Realms;
 using WebCommonStrings = osu.Game.Resources.Localisation.Web.CommonStrings;
@@ -44,6 +46,9 @@ namespace osu.Game.Overlays.Settings.Sections
 
         [Resolved(CanBeNull = true)]
         private IDialogOverlay dialogOverlay { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private INotificationOverlay notificationOverlay { get; set; }
 
         public override LocalisableString Header => SkinSettingsStrings.SkinSectionHeader;
 
@@ -102,6 +107,19 @@ namespace osu.Game.Overlays.Settings.Sections
                     Caption = SkinSettingsStrings.SkinLayoutEditor,
                     Action = () => skinEditor?.ToggleVisibility(),
                 }),
+                CreateItem(new ButtonEntry
+                {
+                    Caption = ToriiOpenFoldersStrings.OpenCurrentSkinFolder,
+                    Action = () => skins.OpenCurrentSkinFolder(n => notificationOverlay?.Post(n)),
+                    Keywords = new[] { "skin", "folder", "explorer", "open", "torii" },
+                }),
+                CreateItem(new ButtonEntry
+                {
+                    Caption = ToriiOpenFoldersStrings.ReloadCurrentSkin,
+                    HintText = ToriiOpenFoldersStrings.ReloadCurrentSkinTooltip,
+                    Action = () => skins.ReloadCurrentSkin(audioOnly: false, notify: true),
+                    Keywords = new[] { "skin", "reload", "refresh", "hot", "torii" },
+                }),
             };
         }
 
@@ -152,6 +170,19 @@ namespace osu.Game.Overlays.Settings.Sections
                 {
                     Caption = SkinSettingsStrings.SkinLayoutEditor,
                     Action = () => skinEditor?.ToggleVisibility(),
+                }),
+                CreateItem(new ButtonEntry
+                {
+                    Caption = ToriiOpenFoldersStrings.OpenCurrentSkinFolder,
+                    Action = () => skins.OpenCurrentSkinFolder(n => notificationOverlay?.Post(n)),
+                    Keywords = new[] { "skin", "folder", "explorer", "open", "torii" },
+                }),
+                CreateItem(new ButtonEntry
+                {
+                    Caption = ToriiOpenFoldersStrings.ReloadCurrentSkin,
+                    HintText = ToriiOpenFoldersStrings.ReloadCurrentSkinTooltip,
+                    Action = () => skins.ReloadCurrentSkin(audioOnly: false, notify: true),
+                    Keywords = new[] { "skin", "reload", "refresh", "hot", "torii" },
                 }),
                 new SkinFavouriteButton(),
                 CreateItem(new CheckboxEntry

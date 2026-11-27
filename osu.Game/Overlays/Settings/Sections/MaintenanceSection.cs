@@ -29,6 +29,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 new CollectionsSettings(),
                 new ScoreSettings(),
                 new ModPresetSettings(),
+                new OpenFoldersMaintenanceSettings(),
                 // Ultimo de todo: es una salida para hardware que se porta mal, no
                 // algo que alguien vaya a tocar en el uso normal.
                 new ExclusiveAudioSettings(),

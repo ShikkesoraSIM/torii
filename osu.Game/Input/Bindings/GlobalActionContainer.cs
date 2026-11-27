@@ -120,6 +120,7 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.R }, GlobalAction.RandomSkin),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.E }, GlobalAction.PreviousSkin),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.T }, GlobalAction.NextSkin),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.Alt, InputKey.S }, GlobalAction.ReloadSkin),
             // torii: ajustar el tamano del cursor al vuelo (Ctrl+Shift+rueda o +/-).
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.MouseWheelUp }, GlobalAction.IncreaseCursorSize),
             new KeyBinding(new[] { InputKey.Control, InputKey.Shift, InputKey.MouseWheelDown }, GlobalAction.DecreaseCursorSize),
@@ -578,6 +579,9 @@ namespace osu.Game.Input.Bindings
 
         [LocalisableDescription(typeof(GlobalActionKeyBindingStrings), nameof(GlobalActionKeyBindingStrings.NextSkin))]
         NextSkin,
+
+        [LocalisableDescription(typeof(ToriiOpenFoldersStrings), nameof(ToriiOpenFoldersStrings.ReloadCurrentSkin))]
+        ReloadSkin,
 
         [LocalisableDescription(typeof(EditorStrings), nameof(EditorStrings.SubmitBeatmap))]
         EditorSubmitBeatmap,

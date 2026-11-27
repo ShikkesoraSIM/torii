@@ -155,6 +155,11 @@ namespace osu.Game
         // Torii: kept alive so the input/audio thread-rate binding isn't collected.
         private Bindable<ToriiInputAudioHzMode> toriiInputAudioHz;
 
+        // Torii: Open Folders storage (readable Skins/ and Songs/ folders + live hot-reload watcher).
+        private Torii.OpenFolders.OpenFoldersStore openFoldersStore;
+        private Torii.OpenFolders.OpenFoldersMigrator openFoldersMigrator;
+        private Torii.OpenFolders.OpenFoldersWatcher openFoldersWatcher;
+
         protected SessionStatics SessionStatics { get; private set; }
 
         protected OsuColour Colours { get; private set; }
@@ -337,7 +342,13 @@ namespace osu.Game
 
             Audio.Samples.PlaybackConcurrency = SAMPLE_CONCURRENCY;
 
-            dependencies.Cache(SkinManager = new SkinManager(Storage, realm, Host, Resources, Audio, Scheduler));
+            // Torii: Open Folders storage (sidecar JSON under torii/, zero Realm schema changes).
+            dependencies.Cache(openFoldersStore = new Torii.OpenFolders.OpenFoldersStore(Storage));
+            dependencies.Cache(openFoldersMigrator = new Torii.OpenFolders.OpenFoldersMigrator(Storage, realm, openFoldersStore));
+            if (Torii.OpenFolders.OpenFoldersStore.IsSupportedOnCurrentPlatform)
+                Task.Run(() => openFoldersMigrator.WarmupSongHashIndex());
+
+            dependencies.Cache(SkinManager = new SkinManager(Storage, realm, Host, Resources, Audio, Scheduler, openFoldersStore, openFoldersMigrator, LocalConfig));
             dependencies.CacheAs<ISkinSource>(SkinManager);
 
             EndpointConfiguration endpoints = CreateEndpoints();
@@ -365,8 +376,12 @@ namespace osu.Game
             // ordering is important here to ensure foreign keys rules are not broken in ModelStore.Cleanup()
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, () => BeatmapManager, Storage, realm, API, LocalConfig));
 
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, API, Audio, Resources, Host, defaultBeatmap, difficultyCache, performOnlineLookups: true));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Storage, realm, API, Audio, Resources, Host, defaultBeatmap, difficultyCache, performOnlineLookups: true, openFoldersStore, openFoldersMigrator, LocalConfig));
             dependencies.CacheAs<IWorkingBeatmapCache>(BeatmapManager);
+
+            // Torii: desktop-only live watchers for Skins/ hot-reload and Songs/ live auto-import (no F5).
+            openFoldersWatcher = new Torii.OpenFolders.OpenFoldersWatcher(openFoldersStore, SkinManager, BeatmapManager, LocalConfig, Scheduler);
+            dependencies.Cache(openFoldersWatcher);
 
             // Torii cosmetics / economy: app-wide owned/equipped/points state, shared by the
             // cursor containers, the username decorator (auras + name colours) and the store.
@@ -1159,6 +1174,8 @@ namespace osu.Game
             // touch happens while config is still alive.
             try { oboeEnabledBindable?.UnbindAll(); } catch { }
             stopOboeBridge();
+
+            openFoldersWatcher?.Dispose();
 
             RulesetStore?.Dispose();
             LocalConfig?.Dispose();
