@@ -31,6 +31,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
         private Drawable opponentDisplay = null!;
         private CoverReveal opponentCoverReveal = null!;
         private CoverReveal playerCoverReveal = null!;
+        private CircularContainer shockwaveRing = null!;
         private VsText vsText = null!;
 
         [BackgroundDependencyLoader]
@@ -51,6 +52,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Rotation = -4f,
+                    Scale = new Vector2(1.08f),
                     Padding = new MarginPadding { Horizontal = -100 },
                     Children =
                     [
@@ -122,6 +127,23 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                     Blending = BlendingParameters.Additive,
                     Alpha = 0,
                 },
+                shockwaveRing = new CircularContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(220),
+                    Masking = true,
+                    BorderThickness = 4f,
+                    BorderColour = Color4Extensions.FromHex(@"7ce8ff"),
+                    Alpha = 0,
+                    Scale = new Vector2(0.15f),
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0,
+                        AlwaysPresent = true,
+                    },
+                },
                 vsText = new VsText
                 {
                     Anchor = Anchor.Centre,
@@ -148,6 +170,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
             using (BeginDelayedSequence(delay))
             {
                 flash.FadeTo(0.65f).FadeOut(550, Easing.OutQuint);
+                shockwaveRing.FadeTo(0.85f).ScaleTo(4.5f, 750, Easing.OutQuint).FadeOut(750, Easing.OutQuad);
 
                 vsText.RevealText();
 

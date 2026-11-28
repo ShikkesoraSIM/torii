@@ -178,7 +178,25 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 
             using (BeginDelayedSequence(delay += 500))
             {
-                Schedule(() => animateGaussianCurve = true);
+                Schedule(() =>
+                {
+                    animateGaussianCurve = true;
+                    var scanline = new Box
+                    {
+                        RelativeSizeAxes = Axes.Y,
+                        Width = 3,
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.Centre,
+                        RelativePositionAxes = Axes.X,
+                        X = 0,
+                        Colour = Color4Extensions.FromHex(@"88e5ff"),
+                        Alpha = 0.8f,
+                        Blending = BlendingParameters.Additive,
+                    };
+
+                    centerContainer.Add(scanline);
+                    scanline.MoveToX(1f, 3800, Easing.InOutSine).Then().FadeOut(300).Expire();
+                });
 
                 this.TransformTo(nameof(starRating), starRating < 5 ? starRating + 4 : starRating - 4);
                 this.TransformTo(nameof(starRating), starRating, 4000, new CubicBezierEasingFunction(easeIn: 0.3, easeOut: 0.5));
@@ -205,7 +223,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                         AutoSizeAxes = Axes.Both,
                         RelativePositionAxes = Axes.X,
                         X = starRating * 0.1f,
-                        Y = 34,
+                        Y = -10,
                         Colour = starRating < OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.ForStarDifficulty(starRating) : colours.ForStarDifficultyText(starRating),
                         Spacing = new Vector2(4, 0),
                         Children =
