@@ -414,7 +414,7 @@ jobs:
             -alias osu \
             -storepass temp123 \
             -keypass temp123 \
-            -dname "CN=osu-torii-temp,OU=osu-torii,O=osu-torii,L=Unknown,S=Unknown,C=Unknown"
+            -dname "CN=torii-temp,OU=torii,O=torii,L=Unknown,S=Unknown,C=Unknown"
           echo "WARNING: Using temporary keystore! Please configure ANDROID_KEYSTORE_BASE64 secret for production builds."
         fi
 
@@ -831,7 +831,7 @@ jobs:
           <key>CFBundleURLTypes</key>
           <array>
             <dict>
-              <key>CFBundleURLName</key><string>osu! links</string>
+              <key>CFBundleURLName</key><string>Torii links</string>
               <key>CFBundleURLSchemes</key><array><string>osu</string><string>osump</string></array>
             </dict>
           </array>

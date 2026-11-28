@@ -25,12 +25,10 @@ namespace osu.Desktop
     public static class Program
     {
 #if DEBUG
-        private const string base_game_name = @"osu-development";
+        private const string base_game_name = @"torii-development";
 #else
-        // torii nova: usamos la MISMA data dir que la Nova vieja (%APPDATA%/osu-torii)
-        // asi el update es seamless: el usuario conserva skins, settings, mapas, scores,
-        // collections, todo. toriirefresh REEMPLAZA a Nova, no convive con ella.
-        private const string base_game_name = @"osu-torii";
+        private const string base_game_name = @"torii";
+        private const string legacy_game_name = @"osu-torii";
 #endif
 
         /// <summary>
@@ -50,6 +48,20 @@ namespace osu.Desktop
                 defaultFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), base_game_name);
             else
                 defaultFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), base_game_name);
+
+#if !DEBUG
+            string legacyFolder = Path.Combine(Path.GetDirectoryName(defaultFolder)!, legacy_game_name);
+            if (!Directory.Exists(defaultFolder) && Directory.Exists(legacyFolder))
+            {
+                try
+                {
+                    Directory.Move(legacyFolder, defaultFolder);
+                }
+                catch
+                {
+                }
+            }
+#endif
 
             string storageIni = Path.Combine(defaultFolder, "storage.ini");
             if (File.Exists(storageIni))

@@ -96,7 +96,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                                     bars = new Container<Bar>
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Padding = new MarginPadding { Top = 28, Horizontal = 4 },
+                                        Padding = new MarginPadding { Top = 38, Horizontal = 4 },
                                     },
                                 ]
                             },
@@ -214,22 +214,22 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                         AutoSizeAxes = Axes.Both,
                         RelativePositionAxes = Axes.X,
                         X = starRating * 0.1f,
-                        Y = -10,
+                        Y = 33,
                         Colour = starRating < OsuColour.STAR_DIFFICULTY_DEFINED_COLOUR_CUTOFF ? colours.ForStarDifficulty(starRating) : colours.ForStarDifficultyText(starRating),
-                        Spacing = new Vector2(4, 0),
+                        Spacing = new Vector2(3, 0),
                         Children =
                         [
                             new OsuSpriteText
                             {
                                 Text = FormattableString.Invariant($"~{starRating:F2}"),
-                                Font = OsuFont.GetFont(size: 24, weight: FontWeight.Bold),
+                                Font = OsuFont.GetFont(size: 19, weight: FontWeight.Bold),
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                             },
                             new SpriteIcon
                             {
                                 Icon = FontAwesome.Solid.Star,
-                                Size = new Vector2(19),
+                                Size = new Vector2(15),
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                             },
