@@ -118,6 +118,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                 flash = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Colour = Color4Extensions.FromHex(@"ffe6a8"),
                     Blending = BlendingParameters.Additive,
                     Alpha = 0,
                 },
@@ -136,6 +137,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                 this.FadeInFromZero(500);
 
                 vsText.AnimateEntry(1000, Easing.OutExpo);
+                vsText.RotateTo(-12f).RotateTo(0f, 1100, Easing.OutQuint);
                 vsText.ScaleTo(0.4f, 1300, Easing.OutExpo);
             }
 
@@ -145,7 +147,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 
             using (BeginDelayedSequence(delay))
             {
-                flash.FadeOutFromOne(500, Easing.Out);
+                flash.FadeTo(0.65f).FadeOut(550, Easing.OutQuint);
 
                 vsText.RevealText();
 

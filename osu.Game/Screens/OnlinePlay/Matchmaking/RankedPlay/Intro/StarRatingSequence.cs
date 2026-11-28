@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -68,7 +69,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                         [
                             title = new OsuSpriteText
                             {
-                                Text = "Refining star difficulty range...",
+                                Text = "Calibrating Torii star tier...",
                                 Padding = new MarginPadding { Bottom = 20 },
                                 Font = OsuFont.Style.Title,
                                 Anchor = Anchor.TopCentre,
@@ -77,23 +78,25 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                             centerContainer = new Container
                             {
                                 RelativeSizeAxes = Axes.X,
-                                Height = 90,
+                                Height = 104,
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Masking = true,
-                                CornerRadius = 8,
+                                CornerRadius = 10,
+                                BorderThickness = 1.5f,
+                                BorderColour = Color4Extensions.FromHex(@"66d9ff").Opacity(0.35f),
                                 Children =
                                 [
                                     new Box
                                     {
-                                        Alpha = 0.4f,
+                                        Alpha = 0.45f,
                                         Colour = overlayColourProvider.Background4,
                                         RelativeSizeAxes = Axes.Both,
                                     },
                                     bars = new Container<Bar>
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Padding = new MarginPadding { Top = 40, Horizontal = 3 },
+                                        Padding = new MarginPadding { Vertical = 14, Horizontal = 4 },
                                     },
                                 ]
                             },
@@ -106,7 +109,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                             },
                             explainer = new OsuSpriteText
                             {
-                                Text = "Difficulty range is calculated to suit the two players.",
+                                Text = "Difficulty range adapts to both players' ratings.",
                                 Padding = new MarginPadding { Top = 20 },
                                 Font = OsuFont.Style.Heading2,
                                 Anchor = Anchor.TopCentre,
@@ -130,8 +133,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                     RelativePositionAxes = Axes.X,
                     X = difficulty / 10f,
                     Width = 0.0075f,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.CentreLeft,
                     Colour = colour.ForStarDifficulty(Math.Max(difficulty, 0.1)),
                     Height = 0
                 });
@@ -232,14 +235,14 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                              .ScaleTo(0)
                              .ScaleTo(1, 400, Easing.OutElasticQuarter);
 
-                    title.Text = "Star rating has been decided!";
+                    title.Text = "Match tier locked!";
 
                     using (BeginDelayedSequence(1050))
                     {
                         explainer.FadeInFromZero(200);
                         Schedule(() =>
                         {
-                            explainer.Text = "There's always a chance that you get maps outside this range";
+                            explainer.Text = "Maps slightly outside this tier may still appear.";
                             noticeSample?.Play();
                         });
                     }
