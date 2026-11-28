@@ -162,6 +162,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 
         private float starRating { get; set; } = 5;
 
+        private float targetStarRating { get; set; } = 5;
+
+        private float rouletteProgress { get; set; } = 0;
+
         private float amplitude { get; set; } = 0;
 
         private float stdDev { get; set; } = 6;
@@ -178,19 +182,17 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 
             using (BeginDelayedSequence(delay += 500))
             {
-                Schedule(() => animateGaussianCurve = true);
+                Schedule(() =>
+                {
+                    targetStarRating = starRating;
+                    rouletteProgress = 0f;
+                    animateGaussianCurve = true;
+                });
 
-                // Roulette-style left <-> right sweeps that gradually slow down and land on target starRating
-                this.TransformTo(nameof(starRating), 1.2f)
-                    .TransformTo(nameof(starRating), 8.8f, 450, Easing.InOutSine)
-                    .Then().TransformTo(nameof(starRating), 1.8f, 550, Easing.InOutSine)
-                    .Then().TransformTo(nameof(starRating), Math.Min(9.2f, starRating + 2.6f), 650, Easing.InOutSine)
-                    .Then().TransformTo(nameof(starRating), Math.Max(0.8f, starRating - 2.0f), 750, Easing.InOutSine)
-                    .Then().TransformTo(nameof(starRating), Math.Min(9.4f, starRating + 0.9f), 850, Easing.InOutSine)
-                    .Then().TransformTo(nameof(starRating), starRating, 950, Easing.OutCubic);
-
-                this.TransformTo(nameof(amplitude), 1f, 4200, new CubicBezierEasingFunction(easeIn: 0.1, easeOut: 0.8));
-                this.TransformTo(nameof(stdDev), 0.3f, 4500, new CubicBezierEasingFunction(easeIn: 0.2, easeOut: 0.7));
+                // Smooth continuous damped-wave roulette sweep that glides slowly into targetStarRating
+                this.TransformTo(nameof(rouletteProgress), 1f, 4400, Easing.OutCubic);
+                this.TransformTo(nameof(amplitude), 1f, 4200, Easing.OutSine);
+                this.TransformTo(nameof(stdDev), 0.35f, 4500, Easing.OutCubic);
 
                 explainer.Delay(400)
                          .FadeIn(200);
@@ -305,6 +307,10 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 
             if (!animateGaussianCurve)
                 return;
+
+            float swing = MathF.Cos(rouletteProgress * MathF.PI * 5f) * MathF.Pow(1f - rouletteProgress, 1.85f) * 3.8f;
+            float gentleDrift = MathF.Sin((float)(Time.Current * 0.003)) * 0.04f;
+            starRating = Math.Clamp(targetStarRating + swing + gentleDrift, 0.5f, 9.5f);
 
             const float min_alpha = 0.4f;
 
