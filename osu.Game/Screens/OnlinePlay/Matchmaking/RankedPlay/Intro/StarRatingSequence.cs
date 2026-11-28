@@ -78,7 +78,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                             centerContainer = new Container
                             {
                                 RelativeSizeAxes = Axes.X,
-                                Height = 104,
+                                Height = 94,
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Masking = true,
@@ -96,7 +96,7 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                                     bars = new Container<Bar>
                                     {
                                         RelativeSizeAxes = Axes.Both,
-                                        Padding = new MarginPadding { Vertical = 14, Horizontal = 4 },
+                                        Padding = new MarginPadding { Top = 28, Horizontal = 4 },
                                     },
                                 ]
                             },
@@ -133,8 +133,8 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
                     RelativePositionAxes = Axes.X,
                     X = difficulty / 10f,
                     Width = 0.0075f,
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
                     Colour = colour.ForStarDifficulty(Math.Max(difficulty, 0.1)),
                     Height = 0
                 });
@@ -178,29 +178,18 @@ namespace osu.Game.Screens.OnlinePlay.Matchmaking.RankedPlay.Intro
 
             using (BeginDelayedSequence(delay += 500))
             {
-                Schedule(() =>
-                {
-                    animateGaussianCurve = true;
-                    var scanline = new Box
-                    {
-                        RelativeSizeAxes = Axes.Y,
-                        Width = 3,
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.Centre,
-                        RelativePositionAxes = Axes.X,
-                        X = 0,
-                        Colour = Color4Extensions.FromHex(@"88e5ff"),
-                        Alpha = 0.8f,
-                        Blending = BlendingParameters.Additive,
-                    };
+                Schedule(() => animateGaussianCurve = true);
 
-                    centerContainer.Add(scanline);
-                    scanline.MoveToX(1f, 3800, Easing.InOutSine).Then().FadeOut(300).Expire();
-                });
+                // Roulette-style left <-> right sweeps that gradually slow down and land on target starRating
+                this.TransformTo(nameof(starRating), 1.2f)
+                    .TransformTo(nameof(starRating), 8.8f, 450, Easing.InOutSine)
+                    .Then().TransformTo(nameof(starRating), 1.8f, 550, Easing.InOutSine)
+                    .Then().TransformTo(nameof(starRating), Math.Min(9.2f, starRating + 2.6f), 650, Easing.InOutSine)
+                    .Then().TransformTo(nameof(starRating), Math.Max(0.8f, starRating - 2.0f), 750, Easing.InOutSine)
+                    .Then().TransformTo(nameof(starRating), Math.Min(9.4f, starRating + 0.9f), 850, Easing.InOutSine)
+                    .Then().TransformTo(nameof(starRating), starRating, 950, Easing.OutCubic);
 
-                this.TransformTo(nameof(starRating), starRating < 5 ? starRating + 4 : starRating - 4);
-                this.TransformTo(nameof(starRating), starRating, 4000, new CubicBezierEasingFunction(easeIn: 0.3, easeOut: 0.5));
-                this.TransformTo(nameof(amplitude), 1f, 4000, new CubicBezierEasingFunction(easeIn: 0.1, easeOut: 0.8));
+                this.TransformTo(nameof(amplitude), 1f, 4200, new CubicBezierEasingFunction(easeIn: 0.1, easeOut: 0.8));
                 this.TransformTo(nameof(stdDev), 0.3f, 4500, new CubicBezierEasingFunction(easeIn: 0.2, easeOut: 0.7));
 
                 explainer.Delay(400)
