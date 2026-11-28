@@ -38,5 +38,7 @@
     <Compile Remove="Visual\UserInterface\TestSceneBeatmapAttributeText.cs" />
     <!-- usa ReleaseStream.Lazer/Tachyon (upstream); Torii tiene su propio enum de streams. -->
     <Compile Remove="NonVisual\TestSceneUpdateManager.cs" />
+    <!-- IntroChristmas assets were stripped in torii-assets -->
+    <Compile Remove="Visual\Menus\TestSceneIntroChristmas.cs" />
   </ItemGroup>
 </Project>
